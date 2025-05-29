@@ -25,7 +25,6 @@ const isLoginPage = computed(() => route.path === '/login')
 
 const metaHeader = computed(() => {
   const meta = route.meta?.header || {}
-	console.log(meta.workshopID)
   return {
     title: meta.title ?? '',
     back: meta.back ?? null,

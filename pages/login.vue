@@ -87,12 +87,8 @@ const { login } = useStrapiAuth()
 const router = useRouter()
 
 const onSubmit = async () => {
-	console.log(state)
   try {
-		const response = await login({ identifier: state.email, password: state.password })
-		
-    console.log('Login erfolgreich:', response)
-
+		await login({ identifier: state.email, password: state.password })
     router.push('/')
   } catch (e) {console.error('Fehler beim Login oder Routing:', e)}
 }

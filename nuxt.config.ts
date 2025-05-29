@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
 	runtimeConfig: {
     public: {
-      strapiBaseUrl: process.env.STRAPI_URL || 'http://localhost:1337'
+      strapiBaseUrl: process.env.STRAPI_URL
     }
   },
   compatibilityDate: '2024-11-01',
@@ -17,8 +17,7 @@ export default defineNuxtConfig({
    '@nuxt/test-utils',
    '@nuxt/ui',
    '@vite-pwa/nuxt',
-   '@nuxtjs/strapi',
-	 '@nuxtjs/strapi'
+   '@nuxtjs/strapi'
   ],
   css: ['~/assets/css/main.css'],
 	imports: {

@@ -85,8 +85,6 @@ const fetchUserWorkshops = async () => {
       new Map(allWorkshops.map((ws) => [ws.id, ws])).values()
     )
     userWorkshops.value = uniqueWorkshops
-
-    console.log(userWorkshops)
   } catch (error) {
     console.error('Fehler beim Laden der User-Workshops:', error)
   }

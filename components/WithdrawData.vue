@@ -154,7 +154,6 @@ async function onSubmit(_event: FormSubmitEvent<typeof state>) {
 
 async function onError(event: FormErrorEvent) {
   if (event?.errors?.[0]?.id) {
-    console.log('Error')
     const element = document.getElementById(event.errors[0].id)
     element?.focus()
     element?.scrollIntoView({ behavior: 'smooth', block: 'center' })

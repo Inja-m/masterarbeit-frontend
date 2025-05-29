@@ -151,7 +151,6 @@ const userGroupId = userParticipation.workshop_group.documentId
 
 const filteredResults = resWorkshopResults.data.map((result) => {
   const filteredComponents = result.Result.filter((component) => {
-    console.log(component)
     return (
       component.__component === 'media.totality' &&
       (
@@ -168,13 +167,10 @@ const filteredResults = resWorkshopResults.data.map((result) => {
 }).filter(result => result.Result.length > 0 || result.evaluationStatus !==  'to do' )
 
 const stepsWithStatus = computed(() => {
-  console.log(filteredResults)
-  console.log(userGroupId)
   return resWorkshop.data.workshop_serie.evaluation_steps.map((step: any) => {
     const result = filteredResults.find(
       (r: any) => r.evaluation_step.id === step.id
     )
-    console.log(result)
     return {
       ...step,
       evaluationStatus: result?.evaluationStatus,

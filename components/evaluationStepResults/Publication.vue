@@ -43,7 +43,7 @@
             target="_blank"
           />
         </div>
-				<div v-html="parseMarkdown(item.description)" class="prose max-w-none mt-4" />
+				<div v-html="parseMarkdownLocal(item.description)" class="prose max-w-none mt-4" />
       </template>
     </UAccordion>
   </div>
@@ -51,14 +51,14 @@
   <div v-if="hasAnyText" class="mt-6">
     <div v-for="res in result" :key="res.id" class="space-y-4">
       <div v-for="textgroup in res.Text" :key="textgroup.id">
-				<div v-html="parseMarkdown(textgroup.text)" class="prose max-w-none" />
+				<div v-html="parseMarkdownLocal(textgroup.text)" class="prose max-w-none" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { parseMarkdown } from '@/utils/parseMarkdown'
+import { parseMarkdownLocal } from '~/utils/parseMarkdownLocal'
 import { useImageUrl } from '@/composables/useImageUrl'
 const { getImageUrl } = useImageUrl()
 
