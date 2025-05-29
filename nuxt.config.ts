@@ -18,33 +18,29 @@ export default defineNuxtConfig({
    '@nuxt/ui',
    '@vite-pwa/nuxt',
    '@nuxtjs/strapi'
-  ], pwa: {
-    registerType: 'autoUpdate',
-    includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
-    manifest: {
-      name: 'CoTrack',
-      short_name: 'CoTrack',
-      start_url: '/',
-      display: 'standalone',
-      icons: [
+  ],
+  css: ['~/assets/css/main.css'],
+	pwa: {
+		manifest:{
+			name:"CoTrack",
+			short_name: "CoTrack",
+			description: "Tracking your Co-Design impact",
+			icons: [
         {
-          src: '/assets/icon.png',
+          src: 'icons/icon_64x64.png',
+          sizes: '64x64',
+          type: 'image/png',
+        },{
+          src: 'icons/icon_192x192.png',
           sizes: '192x192',
           type: 'image/png',
         },
-        {
-          src: '/assets/icon.png',
-          sizes: '512x512',
-          type: 'image/png',
-        },
       ],
-    },
-    workbox: {
-      navigateFallback: '/', 
-      globPatterns: ['**/*.{js,css,html,png,svg,ico}'], 
-    },
-  },
-  css: ['~/assets/css/main.css'],
+		},
+		 workbox: {
+      navigateFallback: '/'
+    }
+	},
 	imports: {
     dirs: ['utils']
   }
