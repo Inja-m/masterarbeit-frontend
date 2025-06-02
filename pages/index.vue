@@ -32,6 +32,11 @@ import { Calendar, MapPin, HandCoins } from 'lucide-vue-next'
 import type { Participation } from '~/types/Participation'
 import type { Workshop } from '~/types/Workshop'
 import { JoinGroupModal } from '#components'
+
+useHead({
+  title: 'CoTrack'
+})
+
 const overlay = useOverlay()
 
 const modal = overlay.create(JoinGroupModal)

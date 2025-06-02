@@ -1,8 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+app: {
+    head: {
+      title: 'CoTrack'
+		} 
+	},
 	runtimeConfig: {
     public: {
-      strapiBaseUrl: process.env.STRAPI_URL
+      strapiBaseUrl: process.env.STRAPI_URL || 'http://localhost:1337'
     }
   },
   compatibilityDate: '2024-11-01',
@@ -39,7 +44,11 @@ export default defineNuxtConfig({
 		},
 		 workbox: {
       navigateFallback: '/'
-    }
+    },
+		devOptions:{
+			enabled:true,
+			type:"module"
+		}
 	},
 	imports: {
     dirs: ['utils']
