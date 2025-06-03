@@ -30,12 +30,17 @@
     <h1 class="pb-4">Wir freuen uns über einen weiteren Austausch</h1>
     <UForm :state="state" class="pb-4" @submit="onSubmit">
       <UFormField name="anonym">
-        <UCheckbox
-          v-model="state.anonym"
-          label="Nachricht anonym senden"
-          color="neutral"
-          class="pb-2"
-        />
+         <template v-if="user?.role?.name === 'Workshop'">
+    <p class="text-sm text-gray-500 pb-2">Diese Nachricht wird automatisch anonym gesendet.</p>
+  </template>
+  <template v-else>
+    <UCheckbox
+      v-model="state.anonym"
+      label="Nachricht anonym senden"
+      color="neutral"
+      class="pb-2"
+    />
+  </template>
       </UFormField>
       <UFormField name="message">
         <UTextarea
@@ -70,12 +75,12 @@ import { Calendar, MapPin, HandCoins } from 'lucide-vue-next'
 import type { Workshop } from '../../types/Workshop'
 import type { WorkshopResult } from '~/types/WorkshopResult'
 import type { Message } from '~/types/Message'
-
+ 
 definePageMeta({
   name: 'workshop-details',
   header: {
-    title: 'Details',
-    back: '/',
+    title: 'Co-Design Workshop',
+    back: null,
     showHeader: true
   }
 })
@@ -85,18 +90,24 @@ const route = useRoute()
 const workshopID = route.params.id as string
 const messages = ref<Message[]>([])
 
-const user = useStrapiUser()
+const user = await useUserWithRole()
 const state = reactive({
   anonym: false,
   message: undefined
 })
-const userWithRole = await findOne('users', user.value.id, {
-  populate: ['role']
-})
+
 onMounted(async () => {
   loadMessages()
-
-console.log('Benutzerrolle:', userWithRole.role.name)
+	 
+  const isWorkshop = user.role.name === 'Workshop'
+  if (!isWorkshop) {
+    // 🛠 Dynamisch die Metadaten nur für diese Seite überschreiben
+    route.meta.header = {
+      title: 'Co-Design Workshop',
+      back: '/',
+      showHeader: true,
+    }
+  }
 })
 const resWorkshop = await findOne<Workshop>('workshops', workshopID, {
   populate: { workshop_serie: { populate: '*' } }
@@ -142,7 +153,7 @@ useHead({
 const userParticipationRes = await find('participations', {
   filters: {
     user: {
-      id: { $eq: user.value.id }
+      id: { $eq: user.id }
     }
   },
   populate: {
@@ -254,12 +265,14 @@ function formatRelativeTime(dateString: string): string {
 
 async function onSubmit(event: FormSubmitEvent<typeof state>) {
   try {
+		const isWorkshopRole = user.role.name === 'Workshop'
+
     const message: any = {
       message: state.message,
       workshop: resWorkshop.data.documentId
     }
-    if (!state.anonym) {
-      message.author = user.value?.id
+    if (!isWorkshopRole && !state.anonym) {
+      message.author = user.id
     }
     await create('messages', message)
     state.anonym = false

@@ -25,7 +25,6 @@
 </template>
 
 <script setup lang="ts">
-import { useStrapi, useStrapiUser } from '#imports'
 import { Bell, BellOff, BellRing } from 'lucide-vue-next'
 
 const props = defineProps<{
@@ -33,14 +32,16 @@ const props = defineProps<{
   workshopId: string
 }>()
 
-const strapi = useStrapi()
+const { find, update } = useStrapi()
 const user = useStrapiUser()
 
 const value = ref<'all' | 'relevant' | 'off'>()
 const participationId = ref<number | null>(null)
 
+const isInitialized = ref(false)
+
 onMounted(async () => {
-  const res = await strapi.find<Participation>('participations', {
+  const res = await find<Participation>('participations', {
     filters: {
       user: { id: { $eq: user.value?.id } },
       workshop_group: { workshops: { id: { $eq: props.workshopId } } }
@@ -52,6 +53,7 @@ onMounted(async () => {
     participationId.value = participation.documentId
     value.value = participation.notification
   }
+	  isInitialized.value = true
 })
 // Dein Radio-Items
 const items = [
@@ -73,10 +75,11 @@ const currentIcon = computed(() => {
 
 // Speichern bei Änderung
 watch(value, async (newVal) => {
-  if (!participationId.value) return
+
+  if (!participationId.value || !isInitialized.value ) return
 
   try {
-    await strapi.update<Participation>('participations', participationId.value, {
+    await update<Participation>('participations', participationId.value, {
       notification: newVal
     })
   } catch (err) {

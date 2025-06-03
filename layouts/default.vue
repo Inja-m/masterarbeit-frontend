@@ -10,7 +10,7 @@
     <main class="grow overflow-y-auto">
       <slot />
     </main>
-		<BottomNavigation v-if="!isLoginPage" />
+		<BottomNavigation v-if="!isLoginPage && !isWorkshopRole" />
   </div>
 </template>
 
@@ -22,6 +22,18 @@ const route = useRoute()
 const router = useRouter()
 
 const isLoginPage = computed(() => route.path === '/login')
+const user = await useUserWithRole()
+
+
+const isWorkshopRole = computed(() => {
+	console.log(user.role.name)
+  return user.role.name === 'Workshop'
+})
+
+onMounted(async() => {
+
+console.log('Benutzerrolle:', user)
+})
 
 const metaHeader = computed(() => {
   const meta = route.meta?.header || {}
