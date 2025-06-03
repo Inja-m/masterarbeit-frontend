@@ -90,9 +90,13 @@ const state = reactive({
   anonym: false,
   message: undefined
 })
-
-onMounted(() => {
+const userWithRole = await findOne('users', user.value.id, {
+  populate: ['role']
+})
+onMounted(async () => {
   loadMessages()
+
+console.log('Benutzerrolle:', userWithRole.role.name)
 })
 const resWorkshop = await findOne<Workshop>('workshops', workshopID, {
   populate: { workshop_serie: { populate: '*' } }
@@ -129,6 +133,11 @@ const resWorkshopResults = await find<WorkshopResult>('workshop-results', {
     }
   }
 })
+
+useHead({
+  title: resWorkshop.data.workshop_serie.name
+})
+
 
 const userParticipationRes = await find('participations', {
   filters: {

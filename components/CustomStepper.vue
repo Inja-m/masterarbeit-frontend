@@ -64,7 +64,8 @@
           </UBadge>
         </div>
       </template>
-			<div v-html="parseMarkdownLocal(steps[activeStep].description)" class="prose max-w-none" />
+			<div v-html="marked(steps[activeStep].description)" class="prose max-w-none"></div>
+			
       <div v-if="steps[activeStep].evaluationStatus === 'done'" class="mt-4">
         <Digitisation
           v-if="steps[activeStep].identifier === 'digitalisation'"
@@ -85,10 +86,10 @@
 
 <script setup lang="ts">
 import * as LucideIcons from 'lucide-vue-next'
-import { parseMarkdownLocal } from '~/utils/parseMarkdownLocal'
 import Digitisation from './evaluationStepResults/Digitisation.vue'
 import Publication from './evaluationStepResults/Publication.vue'
 import Qualitative from './evaluationStepResults/Qualitative.vue'
+import { marked } from 'marked'
 
 const {  find } = useStrapi()
 const route = useRoute()
