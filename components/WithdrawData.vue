@@ -1,23 +1,18 @@
 <template>
-  <UModal
+  <BaseModalAction
     v-model:open="modalOpen"
-    fullscreen
     title="Daten zurückziehen"
-    :close="{
-      color: 'neutral'
-    }"
+    label="Daten zurückziehen"
+    icon="i-lucide-file-x"
   >
-    <UButton
-      label="Daten zurückziehen"
-      color="neutral"
-      variant="ghost"
-      icon="i-lucide-file-x"
-    />
     <template #body>
-			<h2>
-				Workshop: {{ resWorkshop.data.workshop_serie.name }}
-			</h2>
-      <p class="mb-6">Gib bitte deinen persönlichen Code ein, damit wir deine Daten aus der Erhebung entfernen können.</p>
+      <h2 class="text-lg font-semibold mb-2">
+        Workshop: {{ resWorkshop?.data?.workshop_serie?.name }}
+      </h2>
+
+      <p class="mb-6">
+        Gib bitte deinen persönlichen Code ein, damit wir deine Daten aus der Erhebung entfernen können.
+      </p>
 
       <UForm
         :validate="validate"
@@ -34,9 +29,10 @@
         >
           <UInput v-model="state.code" :disabled="verified" class="w-full" />
         </UFormField>
+
         <div class="flex justify-end my-6">
           <UButton
-						v-if="!verified"
+            v-if="!verified"
             label="Code überprüfen"
             type="submit"
             class="flex justify-end"
@@ -53,43 +49,44 @@
       >
         <template #title>Hinweis zum Datenrückzug</template>
         <template #description>
-          Durch das Zurückziehen werden deine Daten dauerhaft gelöscht und nicht
-          in der Auswertung verwendet. Bei Gruppenarbeiten wird die gesamte
-          Gruppenarbeit entfernt.
+          Durch das Zurückziehen werden deine Daten dauerhaft gelöscht und nicht in der Auswertung verwendet.
+          Bei Gruppenarbeiten wird die gesamte Gruppenarbeit entfernt.
         </template>
       </UAlert>
-			</template>
-			<template #footer>
+
       <UModal v-model:open="showModal" title="Daten löschen?">
-        <UButton
-          v-if="verified"
-          label="Daten jetzt zurückziehen"
-          color="neutral"
-          class="w-full flex justify-center items-center"
-          @click="confirmWithdraw"
-        />
         <template #body>
           <p>
-            Möchtest du wirklich deine Daten entfernen? Diese Aktion kann nicht
-            rückgängig gemacht werden.
+            Möchtest du wirklich deine Daten entfernen? Diese Aktion kann nicht rückgängig gemacht werden.
           </p>
         </template>
         <template #footer>
-          <UButton color="neutral" variant="subtle" @click="showModal = false"
-            >Abbrechen</UButton
-          >
-          <UButton color="neutral" variant="outline" @click="withdraw"
-            >Ja, löschen</UButton
-          >
+          <UButton color="neutral" variant="subtle" @click="showModal = false">
+            Abbrechen
+          </UButton>
+          <UButton color="neutral" variant="outline" @click="withdraw">
+            Ja, löschen
+          </UButton>
         </template>
       </UModal>
     </template>
-  </UModal>
+
+    <template #footer>
+      <UButton
+        v-if="verified"
+        label="Daten jetzt zurückziehen"
+        color="neutral"
+        class="w-full flex justify-center items-center"
+        @click="confirmWithdraw"
+      />
+    </template>
+  </BaseModalAction>
 </template>
 
 <script setup lang="ts">
 import type { FormError, FormErrorEvent, FormSubmitEvent } from '@nuxt/ui'
 import type { Workshop } from '../types/Workshop'
+import BaseModalAction from './BaseModalAction.vue'
 
 const props = defineProps<{
   open: boolean
@@ -119,19 +116,10 @@ const resWorkshop = await findOne<Workshop>('workshops', props.workshopId, {
   populate: { workshop_serie: { populate: '*' } }
 })
 
-watch(
-  () => props.open,
-  (val) => {
-    modalOpen.value = val
-  }
-)
+watch(() => props.open, (val) => (modalOpen.value = val))
+watch(modalOpen, (val) => emit('update:open', val))
+watch(showModal, (val) => (modalOpen.value = val))
 
-watch(modalOpen, (val) => {
-  emit('update:open', val)
-})
-watch(showModal, (val) => {
-  modalOpen.value = val
-})
 
 const validate = async (state: any): Promise<FormError[]> => {
   const errorList = []
@@ -162,13 +150,14 @@ async function onError(event: FormErrorEvent) {
 
 async function validateCode(code: string) {
   const res = await find('personal-codes', {
-      filters: {
-        code: { $eq: code }
-      }
+    filters: {
+      code: { $eq: code }
+    }
   })
-	codeId.value = res.data[0].documentId
+  codeId.value = res.data[0]?.documentId
   return res.data.length > 0
 }
+
 function confirmWithdraw() {
   showModal.value = true
 }
@@ -178,13 +167,11 @@ async function withdraw() {
     await update('personal-codes', codeId.value, {
       withdraw: true
     })
-
-  showModal.value = false
-  verified.value = false
-  state.code = ''
-} catch (error) {
+    showModal.value = false
+    verified.value = false
+    state.code = ''
+  } catch (error) {
     console.error('Fehler beim Setzen von withdraw:', error)
   }
 }
-
 </script>

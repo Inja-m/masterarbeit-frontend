@@ -1,6 +1,5 @@
 <template>
   <Section class="min-h-screen flex items-center justify-center" >
-    <div class="m-4">
       <UTabs
         :items="items"
         variant="link"
@@ -9,17 +8,16 @@
       >
         <!-- Login Tab -->
         <template #login="{ item }">
-          <p class="text-muted mb-4">{{ item.description }}</p>
-          <LoginForm title="Melde dich mit deinem Konto an"/>
+          <LoginForm title="Anmelden"/>
+					<p class="text-center text-muted mt-4">{{ item.description }}</p>
         </template>
 
         <!-- Workshop Tab -->
         <template #workshop="{ item }">
-          <p class="text-muted mb-4">{{ item.description }}</p>
-          <LoginForm title="Zugang über Workshop-Identifier" identifierLabel="Workshop-Identifier" />
+          <LoginForm title="Workshop Anzeigen" identifierLabel="Workshop-Identifier" />
+					<p class="text-center text-muted mt-4">{{ item.description }}</p>
         </template>
       </UTabs>
-    </div>
   </Section>
 </template>
 
@@ -28,11 +26,13 @@ const items = [
   {
     label: 'Workshop ansehen',
     icon: 'i-lucide-laptop',
+		description: 'Zugang über Workshop-Identifier',
     slot: 'workshop' as const
   },
 	{
     label: 'Login',
     icon: 'i-lucide-log-in',
+		description: 'Melde dich in deinem Konto an',
     slot: 'login' as const
   }
 ] satisfies TabsItem[]

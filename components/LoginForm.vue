@@ -1,7 +1,7 @@
 <template>
   <UCard class="w-full" variant="soft">
     <template #header>
-      <h2 class="text-center">{{ title }}</h2>
+      <h1 class="text-center">{{ title }}</h1>
     </template>
 
     <UForm
@@ -14,7 +14,7 @@
         <UInput
           v-model="state.identifier"
           :placeholder="computedLabel"
-          icon="i-heroicons-user-circle"
+          icon="i-lucide-circle-user"
           required
           class="w-full"
         />
