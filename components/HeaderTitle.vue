@@ -31,7 +31,6 @@ import { EllipsisVertical, ChevronLeft } from 'lucide-vue-next'
 
 defineProps<{
   title: string
-	workshopId?: string
   showBack?: string
 	showX?: boolean
 }>()
@@ -39,9 +38,9 @@ defineProps<{
 defineEmits(['back'])
 
 const route = useRoute()
-const workshopId = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
-const showDrawer = computed(() => route.name === 'workshop-details')
 
+const workshopId =  route.params.id
+const showDrawer = computed(() => route.name === 'workshop-details')
 const openDrawer = ref(false)
 const openModal = ref(false)
 

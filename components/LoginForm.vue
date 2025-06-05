@@ -63,7 +63,7 @@ const props = defineProps<{
 }>()
 
 const show = ref(false)
-const { findOne } = useStrapi()
+const { find } = useStrapi()
 
 // Dynamisches Label
 const computedLabel = computed(
@@ -112,7 +112,7 @@ const onSubmit = async () => {
 
 		const user = await useUserWithRole()
     if (user.role.name === 'Workshop') {
-      const { data } = await findOne('participations', {
+      const { data } = await find('participations', {
         filters: {
           user: {
             id: { $eq: user.id }
