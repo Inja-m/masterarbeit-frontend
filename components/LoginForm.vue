@@ -56,6 +56,8 @@
 
 <script setup lang="ts">
 import * as v from 'valibot'
+import { until } from '@vueuse/core'
+
 
 const props = defineProps<{
   title: string
@@ -110,12 +112,13 @@ const onSubmit = async () => {
       password: state.password
     })
 
-		const user = await useUserWithRole()
-    if (user.role.name === 'Workshop') {
+    const user = await useUserWithRole()
+		await until(user).toMatch(u => !!u?.role?.name)
+    if (user.value?.role?.name === 'Workshop') {
       const { data } = await find('participations', {
         filters: {
           user: {
-            id: { $eq: user.id }
+            id: { $eq: user.value.id }
           }
         },
         populate: {
@@ -124,10 +127,12 @@ const onSubmit = async () => {
           }
         }
       })
-			router.push(`/workshop/${data[0].workshop_group?.workshop?.documentId}`)
-    } else {
-      router.push('/')
+
+      return navigateTo(`/workshop/${data[0].workshop_group?.workshop?.documentId}`)
     }
+
+    return navigateTo('/')
+
   } catch (e) {
     console.error('Login fehlgeschlagen:', e)
   }

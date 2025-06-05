@@ -26,13 +26,8 @@ const user = await useUserWithRole()
 
 
 const isWorkshopRole = computed(() => {
-	console.log(user.role.name)
-  return user.role.name === 'Workshop'
-})
-
-onMounted(async() => {
-
-console.log('Benutzerrolle:', user)
+	console.log(user.value?.role?.name)
+	 return user.value?.role?.name === 'Workshop'
 })
 
 const metaHeader = computed(() => {

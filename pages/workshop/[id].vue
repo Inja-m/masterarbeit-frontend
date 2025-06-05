@@ -99,7 +99,7 @@ const state = reactive({
 onMounted(async () => {
   loadMessages()
 	 
-  const isWorkshop = user.role.name === 'Workshop'
+  const isWorkshop = user.value.role.name === 'Workshop'
   if (!isWorkshop) {
     // 🛠 Dynamisch die Metadaten nur für diese Seite überschreiben
     route.meta.header = {
@@ -153,7 +153,7 @@ useHead({
 const userParticipationRes = await find('participations', {
   filters: {
     user: {
-      id: { $eq: user.id }
+      id: { $eq: user.value.id }
     }
   },
   populate: {
@@ -265,14 +265,14 @@ function formatRelativeTime(dateString: string): string {
 
 async function onSubmit(event: FormSubmitEvent<typeof state>) {
   try {
-		const isWorkshopRole = user.role.name === 'Workshop'
+		const isWorkshopRole = user.value.role.name === 'Workshop'
 
     const message: any = {
       message: state.message,
       workshop: resWorkshop.data.documentId
     }
     if (!isWorkshopRole && !state.anonym) {
-      message.author = user.id
+      message.author = user.value.id
     }
     await create('messages', message)
     state.anonym = false
