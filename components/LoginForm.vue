@@ -1,25 +1,41 @@
 <template>
   <UCard class="w-full" variant="soft">
     <template #header>
-      <h1 class="text-center">{{ title }}</h1>
+      <h1 class="text-center">{{ isRegister ? 'Registrieren' : title }}</h1>
     </template>
 
     <UForm
-      :schema="formSchema"
+		:validate="validate"
+      :schema="schema"
       :state="state"
       class="space-y-4"
       @submit="onSubmit"
     >
-      <UFormField :label="computedLabel" name="identifier">
+		<div v-if="loginError" class="text-error text-sm">
+  {{ loginError }}
+</div>
+      <!-- Profilname oder Identifier -->
+      <UFormField :label="isRegister ? 'Profilname' : identifierLabel" name="identifier">
         <UInput
           v-model="state.identifier"
-          :placeholder="computedLabel"
+          :placeholder="isRegister ? 'Profilname' : identifierLabel"
           icon="i-lucide-circle-user"
           required
           class="w-full"
         />
       </UFormField>
 
+      <!-- E-Mail nur bei Registrierung -->
+      <UFormField v-if="isRegister" label="E-Mail" name="email">
+        <UInput
+          v-model="state.email"
+          placeholder="E-Mail-Adresse"
+          icon="i-lucide-mail"
+          class="w-full"
+        />
+      </UFormField>
+
+      <!-- Passwort -->
       <UFormField label="Passwort" name="password">
         <UInput
           v-model="state.password"
@@ -41,6 +57,17 @@
         </UInput>
       </UFormField>
 
+      <!-- Passwort bestätigen -->
+      <UFormField v-if="isRegister" label="Passwort wiederholen" name="confirmPassword">
+        <UInput
+          v-model="state.confirmPassword"
+          :type="show ? 'text' : 'password'"
+          placeholder="Passwort bestätigen"
+          icon="i-lucide-shield"
+          class="w-full"
+        />
+      </UFormField>
+
       <div class="flex justify-end pt-4">
         <UButton type="submit">{{ computedButtonText }}</UButton>
       </div>
@@ -48,7 +75,10 @@
 
     <template #footer>
       <p class="text-sm text-center text-gray-500 dark:text-gray-400">
-        Noch kein Konto?
+        {{ isRegister ? 'Schon ein Konto?' : 'Noch kein Konto?' }}
+        <UButton variant="link" @click="isRegister = !isRegister" size="sm">
+          {{ isRegister ? 'Einloggen' : 'Registrieren' }}
+        </UButton>
       </p>
     </template>
   </UCard>
@@ -64,50 +94,61 @@ const props = defineProps<{
   identifierLabel?: string
 }>()
 
+const { login, register } = useStrapiAuth()
+
 const show = ref(false)
-const { find } = useStrapi()
+const isRegister = ref(false)
+const loginError = ref<string | null>(null)
 
-// Dynamisches Label
-const computedLabel = computed(
-  () => props.identifierLabel?.trim() || 'E-Mail oder Profilname'
-)
+const computedButtonText = computed(() => {
+  if (props.title === 'Workshop Anzeigen') return 'Ansehen'
+	if (isRegister.value) return 'Registrieren'
+  return 'Login'
+})
 
-const computedButtonText = computed(() =>
-  props.identifierLabel ? 'Ansehen' : 'Login'
-)
-
-function isEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+const schema = computed(() => {
+  if (isRegister.value) {
+    return v.object({
+      identifier: v.pipe(v.string(), v.minLength(2, 'Min. 2 Zeichen')),
+      email: v.pipe(v.string(), v.email('Gültige E-Mail erforderlich')),
+      password: v.pipe(v.string(), v.minLength(6, 'Min. 6 Zeichen')),
+      confirmPassword: v.pipe(v.string(), v.minLength(6, 'Min. 6 Zeichen')),
+    })
+  } else {
+    return v.object({
+      identifier: v.pipe(v.string(), v.minLength(2, 'Min. 2 Zeichen')),
+      password: v.pipe(v.string(), v.minLength(6, 'Min. 6 Zeichen')),
+    })
+  }
+})
+const validate = (state: any): FormError[] => {
+  const errors = []
+   if (isRegister.value && state.password !== state.confirmPassword) {
+    errors.push({ name: 'confirmPassword', message: 'Nicht identisch' })
+  }
+  return errors
 }
 
-const formSchema = v.object({
-  identifier: v.custom((val: string) => {
-    if (!props.identifierLabel) {
-      // flexible Validierung
-      if (isEmail(val)) {
-        const result = v.safeParse(v.email(), val)
-        return result.success || 'Ungültige E-Mail-Adresse'
-      } else {
-        return val.length >= 2 || 'Profilname zu kurz'
-      }
-    } else {
-      return val.length >= 2 || 'Ungültige Eingabe'
-    }
-  }),
-  password: v.pipe(v.string(), v.minLength(6, 'Mindestens 6 Zeichen'))
-})
-
+// Form-Zustand
 const state = reactive({
   identifier: '',
-  password: ''
+  email: '',
+  password: '',
+  confirmPassword: ''
 })
 
-const { login } = useStrapiAuth()
-const router = useRouter()
-
+// Registrierung oder Login
 const onSubmit = async () => {
+	console.log('submit')
   try {
-    await login({
+    if (isRegister.value) {
+      await register({
+        username: state.identifier,
+        email: state.email,
+        password: state.password
+      })
+		}
+		await login({
       identifier: state.identifier,
       password: state.password
     })
@@ -115,26 +156,20 @@ const onSubmit = async () => {
     const user = await useUserWithRole()
 		await until(user).toMatch(u => !!u?.role?.name)
     if (user.value?.role?.name === 'Workshop') {
+      const { find } = useStrapi()
       const { data } = await find('participations', {
-        filters: {
-          user: {
-            id: { $eq: user.value.id }
-          }
-        },
-        populate: {
-          workshop_group: {
-            populate: ['workshop']
-          }
-        }
+        filters: { user: { id: { $eq: user.value.id } } },
+        populate: { workshop_group: { populate: ['workshop'] } }
       })
 
       return navigateTo(`/workshop/${data[0].workshop_group?.workshop?.documentId}`)
     }
 
     return navigateTo('/')
-
+	
   } catch (e) {
-    console.error('Login fehlgeschlagen:', e)
+    console.error('Login/Register fehlgeschlagen:', e.error)
+		 loginError.value = e.error.message
   }
 }
 </script>

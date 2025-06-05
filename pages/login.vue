@@ -8,7 +8,7 @@
       >
         <!-- Login Tab -->
         <template #login="{ item }">
-          <LoginForm title="Anmelden"/>
+          <LoginForm title="Anmelden" identifierLabel="E-Mail oder Profilname"/>
 					<p class="text-center text-muted mt-4">{{ item.description }}</p>
         </template>
 

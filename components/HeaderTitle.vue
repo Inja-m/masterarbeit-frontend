@@ -23,7 +23,7 @@
 						@update:open="handleModalToggle"
           >
             <template #body>
-              <LoginForm title="Anmelden" />
+              <LoginForm title="Anmelden" identifierLabel="E-Mail oder Profilname"/>
             </template>
           </BaseModalAction>
 					<WithdrawData
