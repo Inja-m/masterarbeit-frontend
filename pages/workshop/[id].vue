@@ -10,7 +10,11 @@
         >{{ resWorkshop.data.workshop_serie.project.name }}</UBadge
       >
       <NotificationSetting
-        :title="`Mitteilungen zu „${resWorkshop.data.workshop_serie.name}“ verwalten`"
+        :title="
+          user?.role?.name === 'Workshop'
+            ? 'Für Mitteilungen melde dich bitte an'
+            : `Mitteilungen zu „${resWorkshop.data.workshop_serie.name}“ verwalten`
+        "
       />
     </div>
     <h1 class="py-2">
@@ -30,17 +34,19 @@
     <h1 class="pb-4">Wir freuen uns über einen weiteren Austausch</h1>
     <UForm :state="state" class="pb-4" @submit="onSubmit">
       <UFormField name="anonym">
-         <template v-if="user?.role?.name === 'Workshop'">
-    <p class="text-sm text-gray-500 pb-2">Diese Nachricht wird automatisch anonym gesendet.</p>
-  </template>
-  <template v-else>
-    <UCheckbox
-      v-model="state.anonym"
-      label="Nachricht anonym senden"
-      color="neutral"
-      class="pb-2"
-    />
-  </template>
+        <template v-if="user?.role?.name === 'Workshop'">
+          <p class="text-sm text-gray-500 pb-2">
+            Diese Nachricht wird automatisch anonym gesendet.
+          </p>
+        </template>
+        <template v-else>
+          <UCheckbox
+            v-model="state.anonym"
+            label="Nachricht anonym senden"
+            color="neutral"
+            class="pb-2"
+          />
+        </template>
       </UFormField>
       <UFormField name="message">
         <UTextarea
@@ -75,7 +81,7 @@ import { Calendar, MapPin, HandCoins } from 'lucide-vue-next'
 import type { Workshop } from '../../types/Workshop'
 import type { WorkshopResult } from '~/types/WorkshopResult'
 import type { Message } from '~/types/Message'
- 
+
 definePageMeta({
   name: 'workshop-details',
   header: {
@@ -98,14 +104,14 @@ const state = reactive({
 
 onMounted(async () => {
   loadMessages()
-	 
+
   const isWorkshop = user.value.role.name === 'Workshop'
   if (!isWorkshop) {
     // 🛠 Dynamisch die Metadaten nur für diese Seite überschreiben
     route.meta.header = {
       title: 'Co-Design Workshop',
       back: '/',
-      showHeader: true,
+      showHeader: true
     }
   }
 })
@@ -131,15 +137,15 @@ const resWorkshopResults = await find<WorkshopResult>('workshop-results', {
     evaluation_step: true,
     Result: {
       on: {
-        'media.totality': { 
-					populate: { 
-						Pictures: { 
-							populate: '*' 
-						},
-						workshop_group: true, 
-            Text: true 
-					} 
-				}
+        'media.totality': {
+          populate: {
+            Pictures: {
+              populate: '*'
+            },
+            workshop_group: true,
+            Text: true
+          }
+        }
       }
     }
   }
@@ -148,7 +154,6 @@ const resWorkshopResults = await find<WorkshopResult>('workshop-results', {
 useHead({
   title: resWorkshop.data.workshop_serie.name
 })
-
 
 const userParticipationRes = await find('participations', {
   filters: {
@@ -169,22 +174,24 @@ const userParticipation = userParticipationRes.data.find(
 
 const userGroupId = userParticipation.workshop_group.documentId
 
-const filteredResults = resWorkshopResults.data.map((result) => {
-  const filteredComponents = result.Result.filter((component) => {
-    return (
-      component.__component === 'media.totality' &&
-      (
-        !component.workshop_group || // keine Workshop-Gruppe zugewiesen
-        component.workshop_group.documentId === userGroupId
+const filteredResults = resWorkshopResults.data
+  .map((result) => {
+    const filteredComponents = result.Result.filter((component) => {
+      return (
+        component.__component === 'media.totality' &&
+        (!component.workshop_group || // keine Workshop-Gruppe zugewiesen
+          component.workshop_group.documentId === userGroupId)
       )
-    )
-  })
+    })
 
-  return {
-    ...result,
-    Result: filteredComponents
-  }
-}).filter(result => result.Result.length > 0 || result.evaluationStatus !==  'to do' )
+    return {
+      ...result,
+      Result: filteredComponents
+    }
+  })
+  .filter(
+    (result) => result.Result.length > 0 || result.evaluationStatus !== 'to do'
+  )
 
 const stepsWithStatus = computed(() => {
   return resWorkshop.data.workshop_serie.evaluation_steps.map((step: any) => {
@@ -194,14 +201,14 @@ const stepsWithStatus = computed(() => {
     return {
       ...step,
       evaluationStatus: result?.evaluationStatus,
-      result:  result?.Result
+      result: result?.Result
     }
   })
 })
 
 const orderedSteps = computed(() => {
   const order = { done: 0, inProgress: 1, todo: 2 }
-   return [...stepsWithStatus.value].sort((a, b) => {
+  return [...stepsWithStatus.value].sort((a, b) => {
     const aStatus = a.evaluationStatus ?? 'todo'
     const bStatus = b.evaluationStatus ?? 'todo'
     return order[aStatus] - order[bStatus]
@@ -265,7 +272,7 @@ function formatRelativeTime(dateString: string): string {
 
 async function onSubmit(event: FormSubmitEvent<typeof state>) {
   try {
-		const isWorkshopRole = user.value.role.name === 'Workshop'
+    const isWorkshopRole = user.value.role.name === 'Workshop'
 
     const message: any = {
       message: state.message,

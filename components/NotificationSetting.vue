@@ -5,7 +5,7 @@
     </UButton>
 
     <template #body>
-      <URadioGroup
+      <URadioGroup v-if="user?.role?.name !== 'Workshop'">
         v-model="value"
         :items="items"
         variant="table"
@@ -20,6 +20,7 @@
           </div>
         </template>
       </URadioGroup>
+			<LoginForm v-if="user?.role?.name === 'Workshop'" :isRegister="true" />
     </template>
   </UDrawer>
 </template>
@@ -33,7 +34,7 @@ const props = defineProps<{
 }>()
 
 const { find, update } = useStrapi()
-const user = useStrapiUser()
+const user = await useUserWithRole()
 
 const value = ref<'all' | 'relevant' | 'off'>()
 const participationId = ref<number | null>(null)

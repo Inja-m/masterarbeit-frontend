@@ -1,7 +1,7 @@
 <template>
   <UCard class="w-full" variant="soft">
     <template #header>
-      <h1 class="text-center">{{ isRegister ? 'Registrieren' : title }}</h1>
+      <h1 class="text-center">{{ computedTitle }}</h1>
     </template>
 
     <UForm
@@ -15,10 +15,10 @@
   {{ loginError }}
 </div>
       <!-- Profilname oder Identifier -->
-      <UFormField :label="isRegister ? 'Profilname' : identifierLabel" name="identifier">
+      <UFormField :label="computedIdentifierLabel" name="identifier">
         <UInput
           v-model="state.identifier"
-          :placeholder="isRegister ? 'Profilname' : identifierLabel"
+          :placeholder="computedIdentifierLabel"
           icon="i-lucide-circle-user"
           required
           class="w-full"
@@ -90,20 +90,31 @@ import { until } from '@vueuse/core'
 
 
 const props = defineProps<{
-  title: string
+  title?: string
   identifierLabel?: string
+	isRegister?: boolean
 }>()
 
 const { login, register } = useStrapiAuth()
 
 const show = ref(false)
-const isRegister = ref(false)
+const isRegister = ref(props.isRegister ?? false)
 const loginError = ref<string | null>(null)
 
 const computedButtonText = computed(() => {
   if (props.title === 'Workshop Anzeigen') return 'Ansehen'
 	if (isRegister.value) return 'Registrieren'
   return 'Login'
+})
+
+const computedTitle = computed(() => {
+	if(props.title && props.isRegister == isRegister.value) return props.title
+  return isRegister.value ? 'Registrieren' : 'Anmelden'
+})
+
+const computedIdentifierLabel = computed(() => {
+	if(props.identifierLabel && props.isRegister == isRegister.value) return props.identifierLabel
+  return isRegister.value ? 'Profilname' : 'Profilname oder E-Mail'
 })
 
 const schema = computed(() => {
