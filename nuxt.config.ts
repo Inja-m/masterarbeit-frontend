@@ -7,7 +7,8 @@ app: {
 	},
 	runtimeConfig: {
     public: {
-      strapiBaseUrl: process.env.STRAPI_URL || 'http://localhost:1337'
+      strapiBaseUrl: process.env.STRAPI_URL,
+			vapidPublicKey: process.env.VAPID_PUBLIC_KEY
     }
   },
   compatibilityDate: '2024-11-01',
@@ -26,6 +27,7 @@ app: {
   ],
   css: ['~/assets/css/main.css'],
 	pwa: {
+		registerType: 'autoUpdate',
 		manifest:{
 			name:"CoTrack",
 			short_name: "CoTrack",
@@ -43,7 +45,7 @@ app: {
       ],
 		},
 		 workbox: {
-      navigateFallback: '/'
+			importScripts: ['/service-worker/push.js']
     },
 		devOptions:{
 			enabled:true,

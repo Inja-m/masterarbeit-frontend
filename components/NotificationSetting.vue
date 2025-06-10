@@ -1,11 +1,12 @@
 <template>
   <UDrawer :title="title">
-    <UButton color="neutral" variant="ghost">
+    <UButton color="neutral" variant="ghost"  @click="registerSubscription">
       <component :is="currentIcon" :size="22" stroke-width="2" />
     </UButton>
 
     <template #body>
-      <URadioGroup v-if="user?.role?.name !== 'Workshop'">
+      <URadioGroup 
+				v-if="user?.role?.name !== 'Workshop'"
         v-model="value"
         :items="items"
         variant="table"
@@ -72,13 +73,22 @@ const items = [
 const currentIcon = computed(() => {
   return items.find((i) => i.value === value.value)?.icon
 })
-
+const registerSubscription = async () => {
+	if(user.value.role.name !== 'Workshop'){
+		try {
+    const result = await useRegisterSubscription()
+    console.log('Push-Abo erfolgreich:', result)
+  } catch (error) {
+    console.error('Fehler beim Registrieren der Subscription:', error)
+  }
+	}
+  
+}
 
 // Speichern bei Änderung
 watch(value, async (newVal) => {
 
   if (!participationId.value || !isInitialized.value ) return
-
   try {
     await update<Participation>('participations', participationId.value, {
       notification: newVal
