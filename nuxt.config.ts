@@ -1,14 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-app: {
-    head: {
-      title: 'CoTrack'
-		} 
-	},
 	runtimeConfig: {
     public: {
       strapiBaseUrl: process.env.STRAPI_URL,
-			vapidPublicKey: process.env.VAPID_PUBLIC_KEY
+		vapidPublicKey: process.env.VAPID_PUBLIC_KEY
     }
   },
   compatibilityDate: '2024-11-01',
@@ -27,30 +22,26 @@ app: {
   ],
   css: ['~/assets/css/main.css'],
 	pwa: {
-		registerType: 'autoUpdate',
 		manifest:{
 			name:"CoTrack",
 			short_name: "CoTrack",
 			description: "Tracking your Co-Design impact",
 			icons: [
         {
-          src: 'icons/icon_64x64.png',
+          src: 'public/icons/icon_64x64.png',
           sizes: '64x64',
           type: 'image/png',
         },{
-          src: 'icons/icon_192x192.png',
+          src: 'public/icons/icon_192x192.png',
           sizes: '192x192',
           type: 'image/png',
         },
       ],
 		},
 		 workbox: {
-			importScripts: ['/service-worker/push.js']
-    },
-		devOptions:{
-			enabled:true,
-			type:"module"
-		}
+			 importScripts: ['/service-worker/push.js'],
+      navigateFallback: '/'
+    }
 	},
 	imports: {
     dirs: ['utils']
