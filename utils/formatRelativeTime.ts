@@ -26,3 +26,18 @@ export function formatRelativeTime(dateString: string): string {
   const years = Math.floor(daysDiff / 365)
   return `${years === 1 ? 'letztes Jahr' : 'vor ${years} Jahren'}`
 }
+
+export function getISOWeek(dateString: string): { week: number; year: number } {
+	const date = new Date(dateString)
+  const tempDate = new Date(date.getTime())
+  tempDate.setHours(0, 0, 0, 0)
+
+  // Donnerstag der aktuellen Woche
+  tempDate.setDate(tempDate.getDate() + 3 - ((tempDate.getDay() + 6) % 7))
+
+  const week1 = new Date(tempDate.getFullYear(), 0, 4)
+  const diff = tempDate.getTime() - week1.getTime()
+
+  const week = 1 + Math.round(diff / (7 * 24 * 60 * 60 * 1000))
+  return { week, year: tempDate.getFullYear() }
+}

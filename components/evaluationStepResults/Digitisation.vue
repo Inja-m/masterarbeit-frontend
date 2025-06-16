@@ -36,7 +36,7 @@
         >
           <h2 class="flex justify-center">{{ item.title }}</h2>
           <img :src="item.src" width="320" height="320" class="rounded-lg" >
-					<div v-html="parseMarkdownLocal(item.description)" class="prose max-w-none mt-2" />
+					<div v-if="item.description" v-html="parseMarkdown(item.description)" class="prose max-w-none mt-2" />
         </UCarousel>
       </template>
     </UModal>

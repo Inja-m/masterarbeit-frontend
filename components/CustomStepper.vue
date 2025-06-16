@@ -80,6 +80,12 @@
           :result="userStories.data"
         />
       </div>
+			<template #footer v-if="steps[activeStep].evaluationStatus !== 'done' && steps[activeStep].estimatedCompletion">
+      <div class="text-xs">
+  Voraussichtlicher Abschluss: KW {{ getISOWeek(steps[activeStep].estimatedCompletion).week }}
+    {{ getISOWeek(steps[activeStep].estimatedCompletion).year }}
+</div>
+    </template>
     </UCard>
   </div>
 </template>
@@ -90,6 +96,7 @@ import Digitisation from './evaluationStepResults/Digitisation.vue'
 import Publication from './evaluationStepResults/Publication.vue'
 import Qualitative from './evaluationStepResults/Qualitative.vue'
 import { marked } from 'marked'
+import { getISOWeek } from '@/utils/formatRelativeTime'
 
 const {  find } = useStrapi()
 const route = useRoute()

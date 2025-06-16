@@ -25,7 +25,36 @@
     <div v-if="resWorkshop.data.reward">
       <IconText :icon="HandCoins" :text="resWorkshop.data.reward" />
     </div>
-    <UAccordion :items="items" />
+		<UAccordion :items="items">
+			<template #body>
+				 {{ resWorkshop.data.workshop_serie.description }} 
+				   <div v-for="image in resWorkshop.data.workshop_serie.material" :key="image.id">
+            <!-- Link anzeigen, wenn vorhanden -->
+            <!-- PDF -->
+            <div v-if="image.mime === 'application/pdf'">
+              <UButton
+                icon="i-lucide-download"
+								:label="image.name"
+                size="sm"
+                color="neutral"
+                variant="ghost"
+                :href="getImageUrl(image)"
+                target="_blank"
+                download
+              />
+            </div>
+
+            <!-- Bild -->
+            <div v-else>
+              <img
+                :src="getImageUrl(image)"
+                :alt="image.name"
+                class="rounded"
+              >
+            </div>
+          </div>
+			</template>
+		</UAccordion>
     <div class="my-4 mx-2">
       <CustomStepper :steps="orderedSteps" :completed-step="completedStep" />
     </div>
@@ -81,6 +110,8 @@ import { Calendar, MapPin, HandCoins } from 'lucide-vue-next'
 import type { Workshop } from '../../types/Workshop'
 import type { WorkshopResult } from '~/types/WorkshopResult'
 import type { Message } from '~/types/Message'
+import { useImageUrl } from '@/composables/useImageUrl'
+const { getImageUrl } = useImageUrl()
 
 definePageMeta({
   name: 'workshop-details',
@@ -119,9 +150,8 @@ const resWorkshop = await findOne<Workshop>('workshops', workshopID, {
 })
 const items = ref<AccordionItem[]>([
   {
-    label: 'Beschreibung',
-    icon: 'i-lucide-scroll-text',
-    content: resWorkshop.data.workshop_serie.description
+    label: 'Weitere Informationen',
+    icon: 'i-lucide-scroll-text'
   }
 ])
 const resWorkshopResults = await find<WorkshopResult>('workshop-results', {
@@ -200,6 +230,7 @@ const stepsWithStatus = computed(() => {
     return {
       ...step,
       evaluationStatus: result?.evaluationStatus,
+			estimatedCompletion: result?.estimatedCompletion,
       result: result?.Result
     }
   })
