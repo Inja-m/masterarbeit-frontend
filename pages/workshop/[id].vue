@@ -11,7 +11,7 @@
       >
       <NotificationSetting
         :title="
-          user?.role?.name === 'Workshop'
+          isWorkshop
             ? 'Für Mitteilungen melde dich bitte an'
             : `Mitteilungen zu „${resWorkshop.data.workshop_serie.name}“ verwalten`
         "
@@ -34,7 +34,7 @@
     <h1 class="pb-4">Wir freuen uns über einen weiteren Austausch</h1>
     <UForm :state="state" class="pb-4" @submit="onSubmit">
       <UFormField name="anonym">
-        <template v-if="user?.role?.name === 'Workshop'">
+        <template v-if="isWorkshop">
           <p class="text-sm text-gray-500 pb-2">
             Diese Nachricht wird automatisch anonym gesendet.
           </p>
@@ -81,7 +81,6 @@ import { Calendar, MapPin, HandCoins } from 'lucide-vue-next'
 import type { Workshop } from '../../types/Workshop'
 import type { WorkshopResult } from '~/types/WorkshopResult'
 import type { Message } from '~/types/Message'
-import type { User } from '~/types/User'
 
 definePageMeta({
   name: 'workshop-details',
@@ -96,19 +95,21 @@ const { findOne, find, create } = useStrapi()
 const route = useRoute()
 const workshopID = route.params.id as string
 const messages = ref<Message[]>([])
-
-
 const { data: user } = await useAsyncData('user', () => useStrapiUser())
+const isWorkshop = ref(false)
+
 const state = reactive({
   anonym: false,
   message: undefined
 })
 
+watch(user, (newUser) => {
+  isWorkshop.value = newUser?.role?.name === 'Workshop'
+})
+
 onMounted(async () => {
   loadMessages()
-
-  const isWorkshop = user.value?.role?.name === 'Workshop'
-  if (!isWorkshop) {
+  if (!isWorkshop.value) {
     route.meta.header = {
       title: 'Co-Design Workshop',
       back: '/',
@@ -245,14 +246,17 @@ async function loadMessages() {
 
 async function onSubmit(event: FormSubmitEvent<typeof state>) {
   try {
-    const isWorkshopRole = user.value.role.name === 'Workshop'
-
+    
+		if (!state.message || state.message.trim() === '') {
+			return 
+		}
     const message: any = {
       message: state.message,
       workshop: resWorkshop.data.documentId
     }
-    if (!isWorkshopRole && !state.anonym) {
-      message.author = user.value.id
+		console.log(isWorkshop.value)
+    if (!isWorkshop.value && !state.anonym) {
+      message.author = user.value.value.id
     }
     await create('messages', message)
     state.anonym = false
