@@ -95,16 +95,12 @@ const { findOne, find, create } = useStrapi()
 const route = useRoute()
 const workshopID = route.params.id as string
 const messages = ref<Message[]>([])
-const { data: user } = await useAsyncData('user', () => useStrapiUser())
-const isWorkshop = ref(false)
+const user = await useStrapiUser()
+const isWorkshop = computed(() => user.value?.role?.name === 'Workshop')
 
 const state = reactive({
   anonym: false,
   message: undefined
-})
-
-watch(user, (newUser) => {
-  isWorkshop.value = newUser?.role?.name === 'Workshop'
 })
 
 onMounted(async () => {
@@ -254,9 +250,9 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
       message: state.message,
       workshop: resWorkshop.data.documentId
     }
-		console.log(isWorkshop.value)
     if (!isWorkshop.value && !state.anonym) {
-      message.author = user.value.value.id
+			console.log(user.value)
+      message.author =user.value.id
     }
     await create('messages', message)
     state.anonym = false
