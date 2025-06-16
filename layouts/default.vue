@@ -26,7 +26,6 @@ const user = await useUserWithRole()
 
 
 const isWorkshopRole = computed(() => {
-	console.log(user.value?.role?.name)
 	 return user.value?.role?.name === 'Workshop'
 })
 

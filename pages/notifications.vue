@@ -6,7 +6,6 @@
     </div>
     <div v-else class="flex flex-col gap-2">
       <div v-for="n in userNotifications" :key="n.id" @click="() => markAsRead(n)">
-				{{ n }}
 				<UCard v-if="n.notification" :variant="n.read ? 'soft' : 'solid'"  >
 					<p class="text-xs font-semibold text-muted mb-1">{{ n.notification?.workshop_groups[0]?.workshop.workshop_serie.name}}  • {{formatRelativeTime(n.createdAt)}}</p>
 					<h2>{{n.notification.title}}</h2>
@@ -26,7 +25,6 @@ const userNotifications = ref<UserNotification[]>([])
 
 const router = useRouter()
 async function markAsRead(n: UserNotification) { 
-	console.log(n)
   if (!n.read) {
     await update('user-notifications', n.documentId, { read: true })
     n.read = true // Optimistisches Update, um reaktives Verhalten sofort zu zeigen

@@ -150,7 +150,6 @@ const state = reactive({
 
 // Registrierung oder Login
 const onSubmit = async () => {
-	console.log('submit')
   try {
     if (isRegister.value) {
       await register({

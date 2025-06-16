@@ -2,7 +2,6 @@ self.addEventListener('push', onPush);
 console.log('[SW] push.js wurde geladen');
 
 async function onPush(event) {
-	console.log('Push-Event empfangen', event)
   if (event.data) {
     const data = event.data.json();
     const { title, ...rest } = data;

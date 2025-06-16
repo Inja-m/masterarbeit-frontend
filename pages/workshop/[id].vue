@@ -81,6 +81,7 @@ import { Calendar, MapPin, HandCoins } from 'lucide-vue-next'
 import type { Workshop } from '../../types/Workshop'
 import type { WorkshopResult } from '~/types/WorkshopResult'
 import type { Message } from '~/types/Message'
+import type { User } from '~/types/User'
 
 definePageMeta({
   name: 'workshop-details',
@@ -96,7 +97,8 @@ const route = useRoute()
 const workshopID = route.params.id as string
 const messages = ref<Message[]>([])
 
-const user = await useUserWithRole()
+
+const { data: user } = await useAsyncData('user', () => useStrapiUser())
 const state = reactive({
   anonym: false,
   message: undefined
@@ -105,9 +107,8 @@ const state = reactive({
 onMounted(async () => {
   loadMessages()
 
-  const isWorkshop = user.value.role.name === 'Workshop'
+  const isWorkshop = user.value?.role?.name === 'Workshop'
   if (!isWorkshop) {
-    // 🛠 Dynamisch die Metadaten nur für diese Seite überschreiben
     route.meta.header = {
       title: 'Co-Design Workshop',
       back: '/',
@@ -115,6 +116,7 @@ onMounted(async () => {
     }
   }
 })
+
 const resWorkshop = await findOne<Workshop>('workshops', workshopID, {
   populate: { workshop_serie: { populate: '*' } }
 })

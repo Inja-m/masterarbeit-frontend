@@ -67,7 +67,6 @@ const validate = async (state: any): Promise<FormError[]> => {
 
 async function onError(event: FormErrorEvent) {
   if (event?.errors?.[0]?.id) {
-		console.log('Error')
     const element = document.getElementById(event.errors[0].id)
     element?.focus()
     element?.scrollIntoView({ behavior: 'smooth', block: 'center' })

@@ -7,7 +7,6 @@ export const useUserWithRole = async () => {
   () => userWithoutRole.value?.id,
   async (newId, oldId) => {
     if (newId && newId !== oldId) {
-      console.log('ID hat sich geändert:', newId)
       user.value = await findOne('users', newId, {
         populate: ['role']
       })

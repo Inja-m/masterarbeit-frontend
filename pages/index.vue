@@ -59,7 +59,6 @@ const fetchUserWorkshops = async () => {
   try {
     const user = await fetchUser()
 		
-		console.log(useStrapiUser().value)
     const response = await find<Participation>('participations', {
       filters: {
         user: {
