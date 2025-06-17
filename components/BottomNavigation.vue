@@ -8,7 +8,9 @@
     </NuxtLink>
 
     <NuxtLink to="/notifications" class="flex flex-col items-center text-sm">
-      <Bell :size=size :stroke-width="stroke" />
+			<UChip color="neutral" :show="unreadCount > 0">
+				<Bell :size=size :stroke-width="stroke" />
+			</UChip>
       <span class="text-xs pt-1">Benachrichtigung</span>
     </NuxtLink>
 
@@ -20,6 +22,10 @@
 </template>
 <script setup lang="ts">
 import { Home, Bell, User } from 'lucide-vue-next'
+import { useNotifications } from '~/composables/userNotification'
+
+const { unreadCount } = useNotifications()
+
 const size = 20
 const stroke = 1.5
 
