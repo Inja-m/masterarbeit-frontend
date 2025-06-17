@@ -21,13 +21,7 @@
 const { fetchNotifications } = useNotifications()
 onMounted(async () => {
   if ('serviceWorker' in navigator) {
-    console.log('[App] Service Worker registriert')
-
-    // Warte, bis er "ready" und kontrollierend ist
     navigator.serviceWorker.ready.then(() => {
-      console.log('[App] Service Worker ist ready')
-
-      // Nur jetzt ergibt der Message-Listener Sinn
       navigator.serviceWorker.addEventListener('message', (event) => {
         console.log('[Client] Push-Nachricht empfangen:', event.data)
         fetchNotifications()
