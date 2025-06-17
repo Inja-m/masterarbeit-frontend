@@ -26,6 +26,16 @@
               <LoginForm title="Anmelden" identifierLabel="E-Mail oder Profilname"/>
             </template>
           </BaseModalAction>
+					<BaseModalAction 
+						title="Codewort angeben"
+            label="Personal Code"
+            icon="i-lucide-key-round"
+						@update:open="handleModalToggle"
+          >
+          <template #body>
+              <AddPersonalCode :workshopId="workshopId" @close="handleModalToggle(false)" />
+            </template>
+          </BaseModalAction>
 					<WithdrawData
             :workshopId="workshopId"
             @update:open="handleModalToggle"

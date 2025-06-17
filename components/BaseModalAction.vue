@@ -16,7 +16,7 @@
       <slot name="body" />
     </template>
 
-    <template #footer>
+    <template  v-if="slots.footer" #footer>
       <slot name="footer" />
     </template>
   </UModal>
@@ -30,6 +30,7 @@ const props = defineProps<{
   open: boolean
 }>()
 
+const slots = useSlots()
 const emit = defineEmits(['update:open'])
 
 const internalOpen = ref(props.open)
