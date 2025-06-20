@@ -64,28 +64,66 @@
           </UBadge>
         </div>
       </template>
-			<div v-html="marked(steps[activeStep].description)" class="prose max-w-none"></div>
-			
+      <div
+        v-html="marked(steps[activeStep].description)"
+        class="prose max-w-none"
+      />
+
       <div v-if="steps[activeStep].evaluationStatus === 'done'" class="mt-4">
-        <Digitisation
-          v-if="steps[activeStep].identifier === 'digitalisation'"
-          :result="steps[activeStep].result"
-        />
-				<Publication
-          v-if="steps[activeStep].identifier === 'publication'"
-          :result="steps[activeStep].result"
-        />
-				<Qualitative
-          v-if="steps[activeStep].identifier === 'qualitative' && userStories.data && userStories.data.length > 0"
-          :result="userStories.data"
-        />
+        <div v-if="!isWorkshop">
+          <Digitisation
+            v-if="steps[activeStep].identifier === 'digitalisation'"
+            :result="steps[activeStep].result"
+          />
+          <Publication
+            v-if="steps[activeStep].identifier === 'publication'"
+            :result="steps[activeStep].result"
+          />
+          <Qualitative
+            v-if="
+              steps[activeStep].identifier === 'qualitative' &&
+              userStories.data &&
+              userStories.data.length > 0
+            "
+            :result="userStories.data"
+          />
+        </div>
+        <div v-if="isWorkshop">
+          <UAlert color="neutral" variant="subtle">
+            <template #description>
+							Melde dich an, um noch weitere Informationen erhalten.
+						</template>
+            <template #actions>								
+              <UModal fullscreen>
+									<UButton
+                  label="Anmelden"
+                  color="neutral"
+                  variant="subtle"
+                />
+                <template #body>
+									<div class="m-2">
+										<LoginForm v-if="user?.role?.name === 'Workshop'" />
+									</div>
+
+                </template>
+              </UModal>
+            </template>
+          </UAlert>
+        </div>
       </div>
-			<template #footer v-if="steps[activeStep].evaluationStatus !== 'done' && steps[activeStep].estimatedCompletion">
-      <div class="text-xs">
-  Voraussichtlicher Abschluss: KW {{ getISOWeek(steps[activeStep].estimatedCompletion).week }}
-    {{ getISOWeek(steps[activeStep].estimatedCompletion).year }}
-</div>
-    </template>
+      <template
+        #footer
+        v-if="
+          steps[activeStep].evaluationStatus !== 'done' &&
+          steps[activeStep].estimatedCompletion
+        "
+      >
+        <div class="text-xs">
+          Voraussichtlicher Abschluss: KW
+          {{ getISOWeek(steps[activeStep].estimatedCompletion).week }}
+          {{ getISOWeek(steps[activeStep].estimatedCompletion).year }}
+        </div>
+      </template>
     </UCard>
   </div>
 </template>
@@ -98,9 +136,11 @@ import Qualitative from './evaluationStepResults/Qualitative.vue'
 import { marked } from 'marked'
 import { getISOWeek } from '@/utils/formatRelativeTime'
 
-const {  find } = useStrapi()
+const { find } = useStrapi()
 const route = useRoute()
 const workshopID = route.params.id as string
+const user = await useUserWithRole()
+const isWorkshop = computed(() => user.value?.role?.name === 'Workshop')
 
 const activeStep = ref(0)
 
@@ -139,5 +179,15 @@ const userStories = await find('user-stories', {
     }
   },
   populate: '*'
-	})
+})
+const registerSubscription = async () => {
+  if (user.value.role.name !== 'Workshop') {
+    try {
+      const result = await useRegisterSubscription()
+      console.log('Push-Abo erfolgreich:', result)
+    } catch (error) {
+      console.error('Fehler beim Registrieren der Subscription:', error)
+    }
+  }
+}
 </script>

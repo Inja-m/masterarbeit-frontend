@@ -1,5 +1,14 @@
 export default defineAppConfig({
   ui: {
+		alert: {
+			variants: {
+				orientation: {
+          vertical: {
+            actions: 'items-center justify-end'
+          },
+				}
+			}
+		},
 		carousel: {
       slots: {
 				dots: '-bottom-6 gap-',
