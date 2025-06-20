@@ -20,7 +20,7 @@
     @error="onError"
   >
 	
-    <UFormField v-if="workshop?.workshop_groups?.length > 1" label="Gruppen Auswahl" name="groupID">
+    <UFormField v-if="workshop?.workshop_groups?.length > 1" label="Gruppen Auswahl" name="groupID" :required="required === false">
       <USelect
         v-model="state.groupId"
         :items="workshop?.workshop_groups.map((g) => ({ label: g.name, value: g.documentId }))"
@@ -33,11 +33,9 @@
     </UFormField>
 <div class="flex items-center justify-end h-full">
 	<UButton :disabled="!isFormValid" type="submit"> Hinzufügen </UButton>
-
 </div>
 			
   </UForm>
-	<AddPersonalCode/>
 </template>
 
 <script setup lang="ts">
@@ -45,12 +43,12 @@ import type { Workshop } from '../types/Workshop'
 import type { FormError, FormErrorEvent, FormSubmitEvent } from '@nuxt/ui'
 
 const { findOne, create } = useStrapi()
-const emit = defineEmits<{ close: [boolean] }>()
+const emit = defineEmits<{ close: [string] }>()
 
 const workshop = ref<Workshop>()
 
 const props = defineProps<{
-  open: boolean
+  required: boolean
   workshopId: string
 }>()
 
@@ -60,13 +58,14 @@ const state = reactive({
 })
 
 const isFormValid = computed(() => {
+	if(!props.required && !!state.groupId ) return true
   return !!state.personalCode && !!state.groupId
 })
 
 const validate = async (state: any): Promise<FormError[]> => {
   const errors = []
   if (!state.groupId) errors.push({ name: 'groupId', message: 'Erforderlich' })
-	if (!state.personalCode) errors.push({ name: 'personalCode', message: 'Erforderlich' })
+	if (props.required && !state.personalCode) errors.push({ name: 'personalCode', message: 'Erforderlich' })
 		return errors
 	}
 
@@ -80,11 +79,13 @@ async function onError(event: FormErrorEvent) {
 
 async function onSubmit(_event: FormSubmitEvent<typeof state>) {
   try {
-    await create('personal-codes', {
-      code: state.personalCode,
-      workshop_group: state.groupId
-    })
-    emit('close', true)
+		if(state.personalCode && state.groupId) {
+			await create('personal-codes', {
+				code: state.personalCode,
+				workshop_group: state.groupId
+			})
+		}
+    emit('close', state.groupId)
   } catch (error: any) {
     console.error(
       'Fehler beim Erstellen des personalCodes:',
@@ -94,13 +95,11 @@ async function onSubmit(_event: FormSubmitEvent<typeof state>) {
 }
 
 const loadWorkshopGroups = async () => {
-	console.log(props.workshopId)
   const res = await findOne<Workshop>('workshops', props.workshopId, {
     populate: { workshop_groups: { populate: '*' }}
   })
-	console.log(res)
   workshop.value = res.data
-
+console.log(workshop.value)
   if ( workshop.value.workshop_groups.length === 1) {
     state.groupId = workshop.value.workshop_groups[0].documentId
   }

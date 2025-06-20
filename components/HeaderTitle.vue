@@ -33,7 +33,7 @@
 						@update:open="handleModalToggle"
           >
           <template #body>
-              <AddPersonalCode :workshopId="getWorkshopId()" @close="handleModalToggle(false)" />
+              <AddPersonalCode :workshopId="getWorkshopId()" :required="true" @close="handleModalToggle(false)" />
             </template>
           </BaseModalAction>
 					<WithdrawData
