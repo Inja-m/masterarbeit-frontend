@@ -8,19 +8,10 @@
     <template #title>Infos zum Codewort</template>
     <template #description>
       Mithilfe deines persönlichen Codewortes kannst du später die Löschung
-      deiner Daten veranlassen.
+      deiner Daten veranlassen. Der Code wird so gespeichert, dass kein Rückschluss auf ein Profil möglich ist.
     </template>
   </UAlert>
-	 <UAlert
-    color="neutral"
-    variant="subtle"
-    class="mb-4"
-  >
-    <template #title>Beispiel für die Erstellung des Codewortes</template>
-    <template #description>
-      <div v-if="workshop?.personalCodeExample" v-html="marked(workshop?.personalCodeExample)" />
-    </template>
-  </UAlert>
+	<PersonalCodeExample :personalCodeExample="workshop?.personalCodeExample" />
   <UForm
     :validate="validate"
     :state="state"
@@ -46,12 +37,11 @@
 </div>
 			
   </UForm>
+	<AddPersonalCode/>
 </template>
 
 <script setup lang="ts">
 import type { Workshop } from '../types/Workshop'
-import { marked } from 'marked'
-
 import type { FormError, FormErrorEvent, FormSubmitEvent } from '@nuxt/ui'
 
 const { findOne, create } = useStrapi()

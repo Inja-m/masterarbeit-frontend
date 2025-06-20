@@ -27,7 +27,7 @@
             </template>
           </BaseModalAction>
 					<BaseModalAction 
-						title="Codewort angeben"
+						title="Codewort speichern"
             label="Personal Code"
             icon="i-lucide-key-round"
 						@update:open="handleModalToggle"

@@ -13,6 +13,7 @@
       <p class="mb-6">
         Gib bitte deinen persönlichen Code ein, damit wir deine Daten aus der Erhebung entfernen können.
       </p>
+			<PersonalCodeExample :personalCodeExample="resWorkshop.data.personalCodeExample" />
 
       <UForm
         :validate="validate"
