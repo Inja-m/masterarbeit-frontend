@@ -26,7 +26,8 @@ const user = await useUserWithRole()
 
 
 const isWorkshopRole = computed(() => {
-	 return user.value?.role?.name === 'Workshop'
+	console.log(user.value.role.name)
+	 return user.value.role.name === 'Workshop'
 })
 
 const metaHeader = computed(() => {

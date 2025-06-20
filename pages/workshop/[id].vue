@@ -126,7 +126,7 @@ const { findOne, find, create } = useStrapi()
 const route = useRoute()
 const workshopID = route.params.id as string
 const messages = ref<Message[]>([])
-const user = await useStrapiUser()
+const user = await useUserWithRole()
 const isWorkshop = computed(() => user.value?.role?.name === 'Workshop')
 
 const state = reactive({
