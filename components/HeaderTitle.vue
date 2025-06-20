@@ -33,11 +33,11 @@
 						@update:open="handleModalToggle"
           >
           <template #body>
-              <AddPersonalCode :workshopId="workshopId" @close="handleModalToggle(false)" />
+              <AddPersonalCode :workshopId="getWorkshopId()" @close="handleModalToggle(false)" />
             </template>
           </BaseModalAction>
 					<WithdrawData
-            :workshopId="workshopId"
+            :workshopId="getWorkshopId()"
             @update:open="handleModalToggle"
           />
         </div>
@@ -60,10 +60,11 @@ defineEmits(['back'])
 const route = useRoute()
 const user = await useUserWithRole()
 
-const workshopId = route.params.id
 const showDrawer = computed(() => route.name === 'workshop-details')
 const openDrawer = ref(false)
 const openModal = ref(false)
+
+const getWorkshopId = () => useRoute().params.id as string
 
 function handleModalToggle(val: boolean) {
   openModal.value = val

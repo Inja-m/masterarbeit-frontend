@@ -104,9 +104,11 @@ async function onSubmit(_event: FormSubmitEvent<typeof state>) {
 }
 
 const loadWorkshopGroups = async () => {
+	console.log(props.workshopId)
   const res = await findOne<Workshop>('workshops', props.workshopId, {
     populate: { workshop_groups: { populate: '*' }}
   })
+	console.log(res)
   workshop.value = res.data
 
   if ( workshop.value.workshop_groups.length === 1) {
