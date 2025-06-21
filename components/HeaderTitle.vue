@@ -67,7 +67,6 @@ const openModal = ref(false)
 const getWorkshopId = () => useRoute().params.id as string
 
 function handleModalToggle(val: boolean) {
-	console.log('called')
   openModal.value = val
   if (!val) {
     // Wenn Modal geschlossen wird, Drawer schließen

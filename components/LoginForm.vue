@@ -162,7 +162,6 @@ const state = reactive({
 // Registrierung oder Login
 const onSubmit = async () => {
   const userBeforeLogin = JSON.parse(JSON.stringify(user.value))
-  console.log(userBeforeLogin)
   try {
 		emit('close', false)
     if (isRegister.value) {
@@ -179,17 +178,13 @@ const onSubmit = async () => {
 		await fetchUser()
 		await nextTick()
 		await until(user).toMatch( u => !!u?.id && u.id !== userBeforeLogin?.id)
-		console.log(user)
-		console.log(userBeforeLogin?.role?.name, user?.value?.role?.name)
+
     if (userBeforeLogin?.role?.name === 'Workshop' && user?.value?.role?.name === 'Authenticated') {
-			console.log('?')
 			try{
 				const workshopParticipation = await find('participations', {
         filters: { user: { id: userBeforeLogin.id  } },
         populate: { workshop_group: { populate: ['workshop'] } }
       })
-			console.log(workshopParticipation.data[0].workshop_group.workshop.documentId )
-
       const userParticipation = await find('participations', {
         filters: {
           user: { id: user?.value?.id },
@@ -201,8 +196,6 @@ const onSubmit = async () => {
         },
         populate: { workshop_group: { populate: ['workshop'] }, user: true }
       })
-			console.log(userParticipation)
-			console.log(userParticipation.data.length)
 			if(userParticipation.data.length > 0) return navigateTo(`/workshop/${workshopParticipation.data[0].workshop_group?.workshop?.documentId}`)
 			// weitere Vorgehen anzeigen des Modals... Neuer user bzw. Participation entfernen...
 			const overlay = useOverlay()
@@ -212,7 +205,12 @@ const onSubmit = async () => {
 					identifier: workshopParticipation.data[0].workshop_group?.workshop?.identifier
 				}
 			})
-			modal.open()
+			  const instance = modal.open()
+  const everythingRight = await instance.result
+
+  if (everythingRight) {
+    return
+  }
       return
 		} catch (e) {
 				console.error(e)

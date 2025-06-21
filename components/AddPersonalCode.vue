@@ -100,7 +100,6 @@ const loadWorkshopGroups = async () => {
     populate: { workshop_groups: { populate: '*' }}
   })
   workshop.value = res.data
-console.log(workshop.value)
   if ( workshop.value.workshop_groups.length === 1) {
     state.groupId = workshop.value.workshop_groups[0].documentId
   }

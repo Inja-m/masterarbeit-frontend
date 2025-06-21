@@ -1,5 +1,5 @@
 <template>
-  <UModal  :close="{ onClick: () => emit('close', false)}" :dismissible="false"  title="Workshop hinzufügen" :close-icon="identifier ? 'i-lucide-x' : undefined">
+  <UModal   :close="identifier ? false : true" :dismissible="false"  title="Workshop hinzufügen" >
     <template #body>
       <UForm
         :validate="validate"
@@ -7,8 +7,8 @@
         class="space-y-4 mb-4"
         @error="onError"
       >
-        <UFormField  label="Workshop-Identifier" name="identifier" required @input="() => validate(state)">
-          <UInput v-model="state.identifier" class="w-full" />
+        <UFormField  label="Workshop-Identifier" name="identifier"   required @input="() => validate(state)">
+          <UInput v-model="state.identifier" :disabled="identifier ? true : false" class="w-full" />
         </UFormField>
       </UForm>
 			<AddPersonalCode v-if="workshop?.documentId" :workshopId="workshop.documentId" :required="false" @close="handleAddPersonalCodeClose" />
