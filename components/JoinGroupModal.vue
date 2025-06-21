@@ -1,5 +1,5 @@
 <template>
-  <UModal  :close="{ onClick: () => emit('close', false) }" :dismissible="false"  title="Workshop hinzufügen" close-icon="i-lucide-x">
+  <UModal  :close="{ onClick: () => emit('close', false)}" :dismissible="false"  title="Workshop hinzufügen" :close-icon="identifier ? 'i-lucide-x' : undefined">
     <template #body>
       <UForm
         :validate="validate"
@@ -20,6 +20,11 @@
 import type { Workshop } from '../types/Workshop'
 import type { FormError, FormErrorEvent } from '@nuxt/ui'
 
+const props = defineProps<{
+  identifier?: string
+}>()
+
+
 const { find, create } = useStrapi()
 const { fetchUser } = useStrapiAuth()
 const emit = defineEmits<{ close: [boolean] }>()
@@ -27,7 +32,7 @@ const emit = defineEmits<{ close: [boolean] }>()
 const workshop = ref<Workshop | null>(null)
 
 const state = reactive({
-  identifier: '',
+  identifier: props.identifier,
 })
 
 
@@ -79,6 +84,10 @@ async function handleAddPersonalCodeClose(groupId: string) {
       JSON.stringify(error, null, 2)
     )
   }
-	
 }
+onMounted(() => {
+  if (props.identifier) {
+    validate(state)
+  }
+})
 </script>

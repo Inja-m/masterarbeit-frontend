@@ -9,6 +9,7 @@
     <template #description>
       Mithilfe deines persönlichen Codewortes kannst du später die Löschung
       deiner Daten veranlassen. Der Code wird so gespeichert, dass kein Rückschluss auf ein Profil möglich ist.
+			Hast du bereit eins für diesen Workshop hinterlegt einfach ignorieren.
     </template>
   </UAlert>
 	<PersonalCodeExample :personalCodeExample="workshop?.personalCodeExample" />

@@ -5,15 +5,15 @@
     </template>
 
     <UForm
-		:validate="validate"
+      :validate="validate"
       :schema="schema"
       :state="state"
       class="space-y-4"
       @submit="onSubmit"
     >
-		<div v-if="loginError" class="text-error text-sm">
-  {{ loginError }}
-</div>
+      <div v-if="loginError" class="text-error text-sm">
+        {{ loginError }}
+      </div>
       <!-- Profilname oder Identifier -->
       <UFormField :label="computedIdentifierLabel" name="identifier">
         <UInput
@@ -58,7 +58,11 @@
       </UFormField>
 
       <!-- Passwort bestätigen -->
-      <UFormField v-if="isRegister" label="Passwort wiederholen" name="confirmPassword">
+      <UFormField
+        v-if="isRegister"
+        label="Passwort wiederholen"
+        name="confirmPassword"
+      >
         <UInput
           v-model="state.confirmPassword"
           :type="show ? 'text' : 'password'"
@@ -87,33 +91,40 @@
 <script setup lang="ts">
 import * as v from 'valibot'
 import { until } from '@vueuse/core'
-
+import type { Workshop } from '../types/Workshop'
+import { JoinGroupModal } from '#components'
 
 const props = defineProps<{
   title?: string
   identifierLabel?: string
-	isRegister?: boolean
+  isRegister?: boolean
 }>()
 
-const { login, register } = useStrapiAuth()
+const { login, register, fetchUser } = useStrapiAuth()
+const { find, create } = useStrapi()
 
 const show = ref(false)
 const isRegister = ref(props.isRegister ?? false)
 const loginError = ref<string | null>(null)
 
+const user = await useUserWithRole()
+
+const emit = defineEmits<{ close: [boolean] }>()
+
 const computedButtonText = computed(() => {
   if (props.title === 'Workshop Anzeigen') return 'Ansehen'
-	if (isRegister.value) return 'Registrieren'
+  if (isRegister.value) return 'Registrieren'
   return 'Login'
 })
 
 const computedTitle = computed(() => {
-	if(props.title && props.isRegister == isRegister.value) return props.title
+  if (props.title && props.isRegister == isRegister.value) return props.title
   return isRegister.value ? 'Registrieren' : 'Anmelden'
 })
 
 const computedIdentifierLabel = computed(() => {
-	if(props.identifierLabel && props.isRegister == isRegister.value) return props.identifierLabel
+  if (props.identifierLabel && props.isRegister == isRegister.value)
+    return props.identifierLabel
   return isRegister.value ? 'Profilname' : 'Profilname oder E-Mail'
 })
 
@@ -123,18 +134,18 @@ const schema = computed(() => {
       identifier: v.pipe(v.string(), v.minLength(2, 'Min. 2 Zeichen')),
       email: v.pipe(v.string(), v.email('Gültige E-Mail erforderlich')),
       password: v.pipe(v.string(), v.minLength(6, 'Min. 6 Zeichen')),
-      confirmPassword: v.pipe(v.string(), v.minLength(6, 'Min. 6 Zeichen')),
+      confirmPassword: v.pipe(v.string(), v.minLength(6, 'Min. 6 Zeichen'))
     })
   } else {
     return v.object({
       identifier: v.pipe(v.string(), v.minLength(2, 'Min. 2 Zeichen')),
-      password: v.pipe(v.string(), v.minLength(6, 'Min. 6 Zeichen')),
+      password: v.pipe(v.string(), v.minLength(6, 'Min. 6 Zeichen'))
     })
   }
 })
 const validate = (state: any): FormError[] => {
   const errors = []
-   if (isRegister.value && state.password !== state.confirmPassword) {
+  if (isRegister.value && state.password !== state.confirmPassword) {
     errors.push({ name: 'confirmPassword', message: 'Nicht identisch' })
   }
   return errors
@@ -150,36 +161,79 @@ const state = reactive({
 
 // Registrierung oder Login
 const onSubmit = async () => {
+  const userBeforeLogin = JSON.parse(JSON.stringify(user.value))
+  console.log(userBeforeLogin)
   try {
+		emit('close', false)
     if (isRegister.value) {
       await register({
         username: state.identifier,
         email: state.email,
         password: state.password
       })
-		}
-		await login({
+    }
+    await login({
       identifier: state.identifier,
       password: state.password
-    })
+    })			
+		await fetchUser()
+		await nextTick()
+		await until(user).toMatch( u => !!u?.id && u.id !== userBeforeLogin?.id)
+		console.log(user)
+		console.log(userBeforeLogin?.role?.name, user?.value?.role?.name)
+    if (userBeforeLogin?.role?.name === 'Workshop' && user?.value?.role?.name === 'Authenticated') {
+			console.log('?')
+			try{
+				const workshopParticipation = await find('participations', {
+        filters: { user: { id: userBeforeLogin.id  } },
+        populate: { workshop_group: { populate: ['workshop'] } }
+      })
+			console.log(workshopParticipation.data[0].workshop_group.workshop.documentId )
 
-    const user = await useUserWithRole()
-		await until(user).toMatch(u => !!u?.role?.name)
+      const userParticipation = await find('participations', {
+        filters: {
+          user: { id: user?.value?.id },
+          workshop_group: {
+            workshop: {
+              documentId: { $eq: workshopParticipation.data[0].workshop_group.workshop.documentId }
+            }
+          }
+        },
+        populate: { workshop_group: { populate: ['workshop'] }, user: true }
+      })
+			console.log(userParticipation)
+			console.log(userParticipation.data.length)
+			if(userParticipation.data.length > 0) return navigateTo(`/workshop/${workshopParticipation.data[0].workshop_group?.workshop?.documentId}`)
+			// weitere Vorgehen anzeigen des Modals... Neuer user bzw. Participation entfernen...
+			const overlay = useOverlay()
+
+			const modal = overlay.create(JoinGroupModal, {
+				props: {
+					identifier: workshopParticipation.data[0].workshop_group?.workshop?.identifier
+				}
+			})
+			modal.open()
+      return
+		} catch (e) {
+				console.error(e)
+			}
+    }
+
     if (user.value?.role?.name === 'Workshop') {
-      const { find } = useStrapi()
       const { data } = await find('participations', {
         filters: { user: { id: { $eq: user.value.id } } },
         populate: { workshop_group: { populate: ['workshop'] } }
       })
 
-      return navigateTo(`/workshop/${data[0].workshop_group?.workshop?.documentId}`)
+      return navigateTo(
+        `/workshop/${data[0].workshop_group?.workshop?.documentId}`
+      )
     }
 
     return navigateTo('/')
-	
   } catch (e) {
     console.error('Login/Register fehlgeschlagen:', e.error)
-		 loginError.value = e.error.message
+    loginError.value = e.error.message
   }
 }
 </script>

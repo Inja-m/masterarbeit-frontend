@@ -23,7 +23,7 @@
 						@update:open="handleModalToggle"
           >
             <template #body>
-              <LoginForm title="Anmelden" identifierLabel="E-Mail oder Profilname"/>
+              <LoginForm @close="handleModalToggle"  title="Anmelden" identifierLabel="E-Mail oder Profilname" />
             </template>
           </BaseModalAction>
 					<BaseModalAction 
@@ -67,6 +67,7 @@ const openModal = ref(false)
 const getWorkshopId = () => useRoute().params.id as string
 
 function handleModalToggle(val: boolean) {
+	console.log('called')
   openModal.value = val
   if (!val) {
     // Wenn Modal geschlossen wird, Drawer schließen
