@@ -3,9 +3,19 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // Seite /login überspringen
   if (to.path === '/login') return
 	
-  const token = useStrapiToken()
-  if (!token.value) {
-		console.log('kein Token')
+    const { fetchUser } = useStrapiAuth()
+  const user = useStrapiUser()
+
+  if (!user.value) {
+    try {
+      await fetchUser()
+    } catch (e) {
+			console.error(e)
+      // Bei SSR: Kein Cookie oder ungültiges Token → kein User
+    }
+  }
+
+  if (!user.value) {
     return navigateTo('/login')
   }
 })

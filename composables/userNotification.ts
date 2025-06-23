@@ -9,9 +9,18 @@ export function useNotifications() {
   fetchNotifications()
 })
   const { find, update } = useStrapi()
-	
+	const { fetchUser } = useStrapiAuth()
+
   const fetchNotifications = async () => {
 		const user = await useStrapiUser()
+		  if (!user.value) {
+    try {
+      await fetchUser()
+    } catch (e) {
+			console.error(e)
+      // Bei SSR: Kein Cookie oder ungültiges Token → kein User
+    }
+  }
     const { data } = await find<UserNotification>('user-notifications', {
       filters: { user: { id: { $eq: user.value.id } } },
 			sort: ['createdAt:desc'],

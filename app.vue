@@ -18,17 +18,24 @@
 </template>
 
 <script setup lang="ts">
-const { fetchNotifications } = useNotifications()
-onMounted(async () => {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.ready.then(() => {
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        console.log('[Client] Push-Nachricht empfangen:', event.data)
-        fetchNotifications()
-      })
-    })
-  }
-})
+//const user = await useUserWithRole()
+
+//onMounted(() => {
+//  console.log('User beim Seitenladen:', user.value.documentId)
+//})
+
+//const { fetchNotifications } = useNotifications()
+
+//onMounted(async () => {
+//  if ('serviceWorker' in navigator) {
+//    navigator.serviceWorker.ready.then(() => {
+//      navigator.serviceWorker.addEventListener('message', (event) => {
+//        console.log('[Client] Push-Nachricht empfangen:', event.data)
+//        fetchNotifications()
+//      })
+//    })
+//  }
+//})
 //import { urlBase64ToUint8Array } from './utils/urlBase64ToUint8Array'
 //const client = useStrapiClient()
 
