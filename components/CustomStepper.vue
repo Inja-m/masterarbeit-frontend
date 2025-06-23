@@ -141,10 +141,10 @@ const route = useRoute()
 const workshopID = route.params.id as string
 const user = await useUserWithRole()
 const isWorkshop = computed(() => user.value?.role?.name === 'Workshop')
-
+const userStories = ref(null)
 const activeStep = ref(0)
 
-const props = defineProps<{
+ defineProps<{
   steps: { name: string; description: string; icon: string }[]
   completedStep: number
 }>()
@@ -170,24 +170,18 @@ function getStatusColor(status: string) {
   }
 }
 
-const userStories = await find('user-stories', {
-  filters: {
-    workshop: {
-      documentId: {
-        $eq: workshopID
-      }
-    }
-  },
-  populate: '*'
-})
-const registerSubscription = async () => {
-  if (user.value.role.name !== 'Workshop') {
-    try {
-      const result = await useRegisterSubscription()
-      console.log('Push-Abo erfolgreich:', result)
-    } catch (error) {
-      console.error('Fehler beim Registrieren der Subscription:', error)
-    }
+onMounted(async () => {
+  if (!isWorkshop.value) {
+    userStories.value = await find('user-stories', {
+      filters: {
+        workshop: {
+          documentId: {
+            $eq: workshopID
+          }
+        }
+      },
+      populate: '*'
+    })
   }
-}
+})
 </script>

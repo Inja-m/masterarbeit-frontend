@@ -5,7 +5,7 @@ export const useUserWithRole = async () => {
 	const { fetchUser } = useStrapiAuth()
 	//const fetchedUser = await fetchUser()
 	//console.log(fetchedUser)
-	console.log(userWithoutRole)
+	//console.log(userWithoutRole)
 	if (!userWithoutRole.value) {
 			try {
 				await fetchUser()

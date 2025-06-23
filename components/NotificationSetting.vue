@@ -87,7 +87,7 @@ const registerSubscription = async () => {
 
 // Speichern bei Änderung
 watch(value, async (newVal) => {
-
+	if(user?.value?.role?.name === 'Workshop') return
   if (!participationId.value || !isInitialized.value ) return
   try {
     await update<Participation>('participations', participationId.value, {

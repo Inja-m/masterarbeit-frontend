@@ -10,7 +10,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     try {
       await fetchUser()
     } catch (e) {
-			console.error(e)
+			console.error('Auth Kein User', e)
       // Bei SSR: Kein Cookie oder ungültiges Token → kein User
     }
   }
