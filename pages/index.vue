@@ -36,6 +36,9 @@ import { JoinGroupModal } from '#components'
 useHead({
   title: 'CoTrack'
 })
+definePageMeta({
+  name: 'home',
+})
 
 const overlay = useOverlay()
 
