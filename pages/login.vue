@@ -39,6 +39,8 @@ const items = [
     slot: 'login' as const
   }
 ] satisfies TabsItem[]
-onMounted(async () => {if(user){await logout()}})
+onMounted(async () => {
+	if(user){await logout()}
+console.log(user)})
 	 
 </script>
