@@ -233,13 +233,13 @@ const onSubmit = async () => {
         filters: { user: { id: { $eq: user.value.id } } },
         populate: { workshop_group: { populate: ['workshop'] } }
       })
-
-			} catch (e) {
-        console.error(e)
-      }
 			return navigateTo(
         `/workshop/${data[0].workshop_group?.workshop?.documentId}`
       )
+			} catch (e) {
+        console.error(e)
+      }
+
     }
 
     return navigateTo('/')
