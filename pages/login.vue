@@ -22,9 +22,6 @@
 </template>
 
 <script setup lang="ts">
-const { logout, fetchUser } = useStrapiAuth()
-const user = await fetchUser()
-
 const items = [
   {
     label: 'Workshop ansehen',
@@ -39,8 +36,4 @@ const items = [
     slot: 'login' as const
   }
 ] satisfies TabsItem[]
-onMounted(async () => {
-	if(user){await logout()}
-console.log(user)})
-	 
 </script>

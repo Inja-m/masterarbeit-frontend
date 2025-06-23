@@ -282,7 +282,7 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
       workshop: resWorkshop.data.documentId
     }
     if (!isWorkshop.value && !state.anonym) {
-			console.log(user.value)
+			//console.log(user.value)
       message.author =user.value.id
     }
     await create('messages', message)
