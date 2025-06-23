@@ -163,7 +163,7 @@ const state = reactive({
 const onSubmit = async () => {
   const userBeforeLogin = JSON.parse(JSON.stringify(user.value))
   try {
-		emit('close', false)
+    emit('close', false)
     if (isRegister.value) {
       await register({
         username: state.identifier,
@@ -174,63 +174,77 @@ const onSubmit = async () => {
     await login({
       identifier: state.identifier,
       password: state.password
-    })			
-		await fetchUser()
-		await nextTick()
-		await until(user).toMatch( u => !!u?.id && u.id !== userBeforeLogin?.id)
+    })
+    await fetchUser()
+    await nextTick()
+    await until(user).toMatch((u) => !!u?.id && u.id !== userBeforeLogin?.id)
 
-    if (userBeforeLogin?.role?.name === 'Workshop' && user?.value?.role?.name === 'Authenticated') {
-			try{
-				const workshopParticipation = await find('participations', {
-        filters: { user: { id: userBeforeLogin.id  } },
-        populate: { workshop_group: { populate: ['workshop'] } }
-      })
-      const userParticipation = await find('participations', {
-        filters: {
-          user: { id: user?.value?.id },
-          workshop_group: {
-            workshop: {
-              documentId: { $eq: workshopParticipation.data[0].workshop_group.workshop.documentId }
+    if (
+      userBeforeLogin?.role?.name === 'Workshop' &&
+      user?.value?.role?.name === 'Authenticated'
+    ) {
+      try {
+        const workshopParticipation = await find('participations', {
+          filters: { user: { id: userBeforeLogin.id } },
+          populate: { workshop_group: { populate: ['workshop'] } }
+        })
+        const userParticipation = await find('participations', {
+          filters: {
+            user: { id: user?.value?.id },
+            workshop_group: {
+              workshop: {
+                documentId: {
+                  $eq: workshopParticipation.data[0].workshop_group.workshop
+                    .documentId
+                }
+              }
             }
+          },
+          populate: { workshop_group: { populate: ['workshop'] }, user: true }
+        })
+        if (userParticipation.data.length > 0)
+          return navigateTo(
+            `/workshop/${workshopParticipation.data[0].workshop_group?.workshop?.documentId}`
+          )
+        // weitere Vorgehen anzeigen des Modals... Neuer user bzw. Participation entfernen...
+        const overlay = useOverlay()
+
+        const modal = overlay.create(JoinGroupModal, {
+          props: {
+            identifier:
+              workshopParticipation.data[0].workshop_group?.workshop?.identifier
           }
-        },
-        populate: { workshop_group: { populate: ['workshop'] }, user: true }
-      })
-			if(userParticipation.data.length > 0) return navigateTo(`/workshop/${workshopParticipation.data[0].workshop_group?.workshop?.documentId}`)
-			// weitere Vorgehen anzeigen des Modals... Neuer user bzw. Participation entfernen...
-			const overlay = useOverlay()
+        })
+        const instance = modal.open()
+        const everythingRight = await instance.result
 
-			const modal = overlay.create(JoinGroupModal, {
-				props: {
-					identifier: workshopParticipation.data[0].workshop_group?.workshop?.identifier
-				}
-			})
-			  const instance = modal.open()
-  const everythingRight = await instance.result
-
-  if (everythingRight) {
-    return
-  }
-      return
-		} catch (e) {
-				console.error(e)
-			}
+        if (everythingRight) {
+          return
+        }
+        return
+      } catch (e) {
+        console.error(e)
+      }
     }
 
     if (user.value?.role?.name === 'Workshop') {
-      const { data } = await find('participations', {
+			try{
+				const { data } = await find('participations', {
         filters: { user: { id: { $eq: user.value.id } } },
         populate: { workshop_group: { populate: ['workshop'] } }
       })
 
-      return navigateTo(
+			} catch (e) {
+        console.error(e)
+      }
+			return navigateTo(
         `/workshop/${data[0].workshop_group?.workshop?.documentId}`
       )
     }
 
     return navigateTo('/')
   } catch (e) {
-    console.error('Login/Register fehlgeschlagen:', e.error)
+    console.error('Login/Register fehlgeschlagen:', e)
     loginError.value = e.error.message
   }
 }
