@@ -223,7 +223,7 @@ const onSubmit = async () => {
         }
         return
       } catch (e) {
-        console.error(e)
+        console.error('workshopParticipation fehlgeschlagenS',e)
       }
     }
 
@@ -237,7 +237,7 @@ const onSubmit = async () => {
         `/workshop/${data[0].workshop_group?.workshop?.documentId}`
       )
 			} catch (e) {
-        console.error(e)
+        console.error('Login Workshop', e)
       }
 
     }

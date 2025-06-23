@@ -26,6 +26,7 @@ export default defineNuxtConfig({
 			name:"CoTrack",
 			short_name: "CoTrack",
 			description: "Tracking your Co-Design impact",
+			start_url: '/',
 			icons: [
         {
           src: 'public/icons/icon_64x64.png',
