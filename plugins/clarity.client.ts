@@ -6,10 +6,12 @@ export default defineNuxtPlugin(async () => {
   const hasConsent = computed(() => consent.value === 'clarity-consent')
 
   if (import.meta.env.MODE === 'production' && hasConsent.value) {	
+		console.log('window',window.clarityInitialized)
 		if (!window.clarityInitialized) {
     const { proxy } = useScriptClarity({id: useRuntimeConfig().public.scripts.clarity.id})
 		const user = await fetchUser()
 		if(user.value) proxy.clarity('identify', user.value.documentId)
+			console.log('user',  user.value.documentId)
 		window.clarityInitialized = true
     }
   } else {
