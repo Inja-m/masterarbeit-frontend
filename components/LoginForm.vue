@@ -125,7 +125,6 @@ const state = reactive({
 
 // Registrierung oder Login
 const onSubmit = async () => {
-	console.log('submit')
 	const userBeforeLogin = JSON.parse(JSON.stringify(user.value))
 	try {
 		emit('close', false)
@@ -140,14 +139,12 @@ const onSubmit = async () => {
 			identifier: state.identifier,
 			password: state.password
 		})
-		console.log('test', user)
 		await until(user).toMatch((u) => !!u?.id && u.id !== userBeforeLogin?.id)
 
 		if (
 			userBeforeLogin?.role?.name === 'Workshop' &&
 			user?.value?.role?.name === 'Authenticated'
 		) {
-			console.log('testen')
 			try {
 				const workshopParticipation = await find('participations', {
 					filters: { user: { id: userBeforeLogin.id } },
@@ -191,14 +188,12 @@ const onSubmit = async () => {
 				console.error('workshopParticipation fehlgeschlagenS', e)
 			}
 		}
-		console.log(user)
 		if (user.value?.role?.name === 'Workshop') {
 			try {
 				const { data } = await find('participations', {
 					filters: { user: { id: { $eq: user.value.id } } },
 					populate: { workshop_group: { populate: ['workshop'] } }
 				})
-				console.log('...')
 				return navigateTo(
 					`/workshop/${data[0].workshop_group?.workshop?.documentId}`
 				)
@@ -216,7 +211,6 @@ const onSubmit = async () => {
 onMounted(() => {
 	const identifier = route.query.identifier as string
 	const password = route.query.password as string
-	console.log(identifier, password)
 	if (identifier && password) {
 		state.password = password
 		state.identifier = identifier

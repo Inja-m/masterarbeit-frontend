@@ -76,8 +76,7 @@ const currentIcon = computed(() => {
 const registerSubscription = async () => {
 	if(user.value.role.name !== 'Workshop'){
 		try {
-    const result = await useRegisterSubscription()
-    console.log('Push-Abo erfolgreich:', result)
+		await useRegisterSubscription()
   } catch (error) {
     console.error('Fehler beim Registrieren der Subscription:', error)
   }

@@ -1,6 +1,5 @@
 <template>
   <div v-if="hasAnyPicture">
-    <h2>Veröffentlichte Materialien</h2>
     <UAccordion type="multiple" :items="accordionItems">
       <template #body="{ item }">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -48,13 +47,6 @@
     </UAccordion>
   </div>
 
-  <div v-if="hasAnyText" class="mt-6">
-    <div v-for="res in result" :key="res.id" class="space-y-4">
-      <div v-for="textgroup in res.Text" :key="textgroup.id">
-				<div v-if="textgroup.text" v-html="marked(textgroup.text)" class="prose max-w-none" />
-      </div>
-    </div>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -70,9 +62,6 @@ const hasAnyPicture = computed(() =>
   props.result?.some((res) => res.Pictures?.length > 0)
 )
 
-const hasAnyText = computed(() =>
-  props.result?.some((res) => res.Text?.some((t) => t.text?.trim()))
-)
 const accordionItems = computed(() => {
   return props.result.flatMap((res) =>
     res.Pictures.map((picGroup) => ({

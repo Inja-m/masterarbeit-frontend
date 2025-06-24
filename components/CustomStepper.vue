@@ -75,36 +75,38 @@
             v-if="steps[activeStep].identifier === 'digitalisation'"
             :result="steps[activeStep].result"
           />
-          <Publication
-            v-if="steps[activeStep].identifier === 'publication'"
-            :result="steps[activeStep].result"
-          />
           <Qualitative
-            v-if="
+            v-else-if="
               steps[activeStep].identifier === 'qualitative' &&
               userStories.data &&
               userStories.data.length > 0
             "
             :result="userStories.data"
           />
+
+          <template v-else-if="steps[activeStep].identifier === 'publication'">
+            <h2>Veröffentlichte Materialien</h2>
+            <EvaluationStep :result="steps[activeStep].result" />
+          </template>
+
+          <template v-else>
+            <TextBlock :result="steps[activeStep].result" />
+            <EvaluationStep :result="steps[activeStep].result" />
+          </template>
+					<TextBlock  v-if="['digitalisation', 'qualitative', 'publication'].includes(steps[activeStep].identifier) === true" :result="steps[activeStep].result" />
         </div>
         <div v-if="isWorkshop">
           <UAlert color="neutral" variant="subtle">
             <template #description>
-							Melde dich an, um noch weitere Informationen erhalten.
-						</template>
-            <template #actions>								
+              Melde dich an, um noch weitere Informationen erhalten.
+            </template>
+            <template #actions>
               <UModal fullscreen>
-									<UButton
-                  label="Anmelden"
-                  color="neutral"
-                  variant="subtle"
-                />
+                <UButton label="Anmelden" color="neutral" variant="subtle" />
                 <template #body>
-									<div class="m-2">
-										<LoginForm v-if="user?.role?.name === 'Workshop'" />
-									</div>
-
+                  <div class="m-2">
+                    <LoginForm v-if="user?.role?.name === 'Workshop'" />
+                  </div>
                 </template>
               </UModal>
             </template>
@@ -131,10 +133,11 @@
 <script setup lang="ts">
 import * as LucideIcons from 'lucide-vue-next'
 import Digitisation from './evaluationStepResults/Digitisation.vue'
-import Publication from './evaluationStepResults/Publication.vue'
+import TextBlock from './evaluationStepResults/TextBlock.vue'
 import Qualitative from './evaluationStepResults/Qualitative.vue'
 import { marked } from 'marked'
 import { getISOWeek } from '@/utils/formatRelativeTime'
+import EvaluationStep from './evaluationStepResults/EvaluationStep.vue'
 
 const { find } = useStrapi()
 const route = useRoute()
@@ -144,7 +147,7 @@ const isWorkshop = computed(() => user.value?.role?.name === 'Workshop')
 const userStories = ref(null)
 const activeStep = ref(0)
 
- defineProps<{
+defineProps<{
   steps: { name: string; description: string; icon: string }[]
   completedStep: number
 }>()

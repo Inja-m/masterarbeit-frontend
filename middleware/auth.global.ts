@@ -16,7 +16,6 @@ const { logout, fetchUser } = useStrapiAuth()
 	console.log(user, to.path)
   if (to.path === '/login') {
 		if(user.value) await logout()
-			console.log(user)
 		return
 	}
 	

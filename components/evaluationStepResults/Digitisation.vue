@@ -36,17 +36,10 @@
         >
           <h2 class="flex justify-center">{{ item.title }}</h2>
           <img :src="item.src" width="320" height="320" class="rounded-lg" >
-					<div v-if="item.description" v-html="parseMarkdown(item.description)" class="prose max-w-none mt-2" />
+					<div v-if="item.description" v-html="marked(item.description)" class="prose max-w-none mt-2" />
         </UCarousel>
       </template>
     </UModal>
-  </div>
-  <div v-if="hasAnyText">
-    <div v-for="res in result" :key="res.id" class="space-y-4">
-      <div v-for="textgroup in res.Text" :key="textgroup.id">
-				<div v-html="marked(textgroup.text)" class="prose max-w-none" />
-      </div>
-    </div>
   </div>
 </template>
 
@@ -61,10 +54,6 @@ const props = defineProps<{
     required: true
   }
 }>()
-
-const hasAnyText = computed(() =>
-  props.result?.some((res) => res.Text?.some((t) => t.text?.trim()))
-)
 
 const hasAnyPicture = computed(() =>
   props.result?.some(res =>
