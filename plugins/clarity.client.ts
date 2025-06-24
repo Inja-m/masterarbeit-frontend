@@ -31,7 +31,7 @@ export default () => {
 
     const { proxy } = useScriptClarity({id: useRuntimeConfig().public.scripts.clarity.id})
 		const user = await fetchUser()
-		if(user?.value) proxy.clarity('identify', user?.value?.documentId)
+		if(user?.value) proxy.clarity('custom-id', user?.value?.documentId)
 			console.log('user',  user?.value?.documentId)
     
   } else {
