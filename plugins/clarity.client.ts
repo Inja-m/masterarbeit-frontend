@@ -10,8 +10,8 @@ export default defineNuxtPlugin(async () => {
 		if (!window.clarityInitialized) {
     const { proxy } = useScriptClarity({id: useRuntimeConfig().public.scripts.clarity.id})
 		const user = await fetchUser()
-		if(user.value) proxy.clarity('identify', user.value.documentId)
-			console.log('user',  user.value.documentId)
+		if(user?.value) proxy.clarity('identify', user?.value?.documentId)
+			console.log('user',  user?.value?.documentId)
 		window.clarityInitialized = true
     }
   } else {
