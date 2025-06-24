@@ -12,6 +12,7 @@ export const useConsentManager = () => {
   const acceptClarity = () => {
     cookieConsent.value = 'clarity-consent'
     trigger.accept()
+		useScriptClarity({id: useRuntimeConfig().public.scripts.clarity.id})
   }
 
   return {

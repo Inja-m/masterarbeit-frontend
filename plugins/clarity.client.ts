@@ -19,23 +19,3 @@
 //  }
 	
 //})
-
-export default () => {
-  const consent = useCookie('cookie-consent')
-	const hasConsent = computed(() => consent.value === 'clarity-consent')
-	const { fetchUser } = useStrapiAuth()
-
-  watch(consent, async (val) => {
-		console.log(val)
-     if (import.meta.env.MODE === 'production' && hasConsent.value) {	
-
-    const { proxy } = useScriptClarity({id: useRuntimeConfig().public.scripts.clarity.id})
-		const user = await fetchUser()
-		if(user?.value) proxy.clarity('custom-id', user?.value?.documentId)
-			console.log('user',  user?.value?.documentId)
-    
-  } else {
-    console.log('[Clarity Plugin] Clarity wird **nicht** geladen. ENV:', import.meta.env, 'Consent:', consent.value)
-  }
-  }, { immediate: true })
-}
