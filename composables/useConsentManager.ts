@@ -13,7 +13,15 @@ export const useConsentManager = () => {
     cookieConsent.value = 'clarity-consent'
     trigger.accept()
 		console.log('accept')
-		const {proxy} = useScriptClarity({id: useRuntimeConfig().public.scripts.clarity.id})
+		const uid = localStorage.getItem('clarity_uid') ?? crypto.randomUUID()
+      localStorage.setItem('clarity_uid', uid)
+
+      const { proxy } = useScriptClarity({
+        id: useRuntimeConfig().public.scripts.clarity.id
+      })
+
+      proxy.clarity('identify', uid)
+      console.log('[Clarity] Initialisiert mit UID:', uid)
 		console.log(proxy)
   }
 
