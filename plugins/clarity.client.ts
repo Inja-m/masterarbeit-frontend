@@ -25,15 +25,16 @@ export default defineNuxtPlugin(() => {
     console.log('[Clarity Plugin] ✅ Läuft auf dem Client.')
   }
 
-  const consent = useCookie('clarity-consent')
-  const hasConsent = computed(() => consent.value === 'true')
+  const consent = useCookie('cookie-consent')
+  const hasConsent = computed(() => consent.value === 'clarity-consent')
+	console.log('[Clarity Plugin]', consent)
 
-  if (import.meta.env.PROD && hasConsent.value) {
+  if (import.meta.env.MODE === 'production' && hasConsent.value) {
     console.log('[Clarity Plugin] Consent vorhanden. Lade Clarity…')
 
     const { proxy } = useScriptClarity({id: useRuntimeConfig().public.scripts.clarity.id})
 		console.log(proxy)
   } else {
-    console.log('[Clarity Plugin] Clarity wird **nicht** geladen. ENV:', import.meta.env.MODE, 'Consent:', consent.value)
+    console.log('[Clarity Plugin] Clarity wird **nicht** geladen. ENV:', import.meta.env, 'Consent:', consent.value)
   }
 })
