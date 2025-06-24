@@ -1,19 +1,29 @@
 <template>
   <div class="flex flex-col h-screen">
-		<HeaderTitle
+    <HeaderTitle
       v-if="metaHeader.showHeader"
       :title="metaHeader.title"
       :show-back="metaHeader.back"
-			:show-x="metaHeader.showX"
+      :show-x="metaHeader.showX"
       @back="handleBack"
     />
-    <main class="grow overflow-y-auto">
-      <slot />
-    </main>
-		<BottomNavigation v-if="!isLoginPage && !isWorkshopRole" />
+    <div class="grow overflow-y-auto flex flex-col justify-between">
+      <main>
+        <slot />
+      </main>
+      <footer class="flex items-end text-center text-xs text-gray-500 py-3">
+        <UContainer class="flex flex-wrap items-end justify-center gap-4">
+          <NuxtLink to="/datenschutz" class="hover:underline"
+            >Datenschutz</NuxtLink
+          >
+          <NuxtLink to="/impressum" class="hover:underline">Impressum</NuxtLink>
+        </UContainer>
+      </footer>
+    </div>
+
+    <BottomNavigation v-if="!isLoginPage && !isWorkshopRole" />
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
@@ -24,9 +34,8 @@ const router = useRouter()
 const isLoginPage = computed(() => route.path === '/login')
 const user = await useUserWithRole()
 
-
 const isWorkshopRole = computed(() => {
-	 return user.value.role.name === 'Workshop'
+  return user.value.role.name === 'Workshop'
 })
 
 const metaHeader = computed(() => {
@@ -35,11 +44,11 @@ const metaHeader = computed(() => {
     title: meta.title ?? '',
     back: meta.back ?? null,
     showHeader: meta.showHeader ?? false,
-		showX: meta.showX ?? false
+    showX: meta.showX ?? false
   }
 })
 
 function handleBack() {
-  router.push(metaHeader.value.back) 
+  router.push(metaHeader.value.back)
 }
 </script>
