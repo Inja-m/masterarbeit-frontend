@@ -13,6 +13,7 @@
         <button @click="sendPush">Push senden</button>
       </div>-->
       <NuxtPage />
+			<CookieBanner />
     </NuxtLayout>
   </UApp>
 </template>

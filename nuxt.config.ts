@@ -1,9 +1,14 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-	runtimeConfig: {
+    runtimeConfig: {
     public: {
+			scripts: {
+        clarity: {
+          id: process.env.NUXT_PUBLIC_SCRIPTS_CLARITY_ID,
+        },
+			},
       strapiBaseUrl: process.env.STRAPI_URL,
-		vapidPublicKey: process.env.VAPID_PUBLIC_KEY
+      vapidPublicKey: process.env.VAPID_PUBLIC_KEY
     }
   },
   compatibilityDate: '2024-11-01',
@@ -18,7 +23,8 @@ export default defineNuxtConfig({
    '@nuxt/test-utils',
    '@nuxt/ui',
    '@vite-pwa/nuxt',
-   '@nuxtjs/strapi'
+   '@nuxtjs/strapi',
+	 '@nuxt/scripts'
   ],
   css: ['~/assets/css/main.css'],
 	pwa: {
