@@ -20,7 +20,7 @@ export const useConsentManager = () => {
         id: useRuntimeConfig().public.scripts.clarity.id
       })
 
-      proxy.clarity("identify", "custom-id", "custom-session-id", "custom-page-id", "friendly-name")
+      proxy.clarity('consent')
       console.log('[Clarity] Initialisiert mit UID:', uid)
 		console.log(proxy)
   }
