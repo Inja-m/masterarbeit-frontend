@@ -1,7 +1,9 @@
 
-export const initClarity = () => {
+export const initClarity = async () => {
 	if (import.meta.env.MODE !== 'production') return
- const consent = useCookie('cookie-consent')
+	const { fetchUser } = useStrapiAuth()
+	const user = await fetchUser()
+ 	const consent = useCookie('cookie-consent')
   const { proxy } = useScriptClarity({
     id: useRuntimeConfig().public.scripts.clarity.id
   })
@@ -12,9 +14,14 @@ export const initClarity = () => {
 				},
 				{ immediate: true }
 			)
-	const uid = localStorage.getItem('clarity_uid') ?? crypto.randomUUID()
-          localStorage.setItem('clarity_uid', uid)
-          proxy.clarity('identify', uid)
-
-					console.log('proxy', proxy)
+	watch(() => user.value,
+				(newVal) => {
+					if(newVal){
+						proxy.clarity('identify', newVal.documentId)
+						console.log('proxy', proxy)
+					}
+				},
+				{ immediate: true }
+			)		
+					
 }
