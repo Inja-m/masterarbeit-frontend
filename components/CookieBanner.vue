@@ -75,7 +75,6 @@ function saveConsent() {
 	}
 }
 onMounted(() => {
-	console.log('clarity',status.value)
   if (status.value ===  'consent') {
     initClarity()
   }
