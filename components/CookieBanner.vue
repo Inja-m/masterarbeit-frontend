@@ -43,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import { initClarity } from '~/utils/initClarity'
 const open = ref(true)
 
 const { acceptClarity, essential, status } = useConsentManager()
@@ -73,4 +74,10 @@ function saveConsent() {
 		essential()
 	}
 }
+onMounted(() => {
+	console.log('clarity',status.value)
+  if (status.value ===  'consent') {
+    initClarity()
+  }
+})
 </script>

@@ -34,9 +34,6 @@ export const useConsentManager = () => {
   return {
     status: cookieConsent,
     acceptClarity,
-		essential,
-    isClarityAccepted: computed(() => cookieConsent.value === 'consent'),
-    isIdle: computed(() => cookieConsent.value === 'idle'),
-    trigger
+		essential
   }
 }
