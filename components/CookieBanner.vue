@@ -45,14 +45,18 @@
 <script setup lang="ts">
 const open = ref(true)
 
-const { acceptClarity, isIdle } = useConsentManager()
+const { acceptClarity, essential, isIdle } = useConsentManager()
 
 defineShortcuts({
   o: () => (open.value = !open.value)
 })
 
-const show = ref(isIdle)
+const show = ref(false)
 const settingsOpen = ref(false)
+
+watchEffect(() => {
+  show.value = isIdle.value
+})
 
 const categories = ref({
   essential: true, // immer true
@@ -61,6 +65,8 @@ const categories = ref({
 function saveConsent() {
   if (categories.value.clarity) {
     acceptClarity()
-  }
+  }else{
+		essential()
+	}
 }
 </script>

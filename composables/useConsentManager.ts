@@ -8,6 +8,9 @@ export const useConsentManager = () => {
   const trigger = useScriptTriggerConsent({
     consent: computed(() => cookieConsent.value === 'consent')
   })
+	const essential = () => {
+    cookieConsent.value = 'essential'
+	}
 
   const acceptClarity = () => {
     cookieConsent.value = 'consent'
@@ -28,6 +31,7 @@ export const useConsentManager = () => {
   return {
     status: cookieConsent,
     acceptClarity,
+		essential,
     isClarityAccepted: computed(() => cookieConsent.value === 'consent'),
     isIdle: computed(() => cookieConsent.value === 'idle'),
     trigger
