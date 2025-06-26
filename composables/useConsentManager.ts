@@ -1,3 +1,4 @@
+import { initClarity } from '~/utils/initClarity'
 export const useConsentManager = () => {
   // Consent wird dauerhaft gespeichert
   const cookieConsent = useCookie<'idle' | 'essential' | 'consent' >('cookie-consent', {
@@ -16,6 +17,8 @@ export const useConsentManager = () => {
     cookieConsent.value = 'consent'
     trigger.accept()
 		console.log('accept')
+		initClarity()
+		
 		//const uid = localStorage.getItem('clarity_uid') ?? crypto.randomUUID()
     //  localStorage.setItem('clarity_uid', uid)
 

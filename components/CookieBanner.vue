@@ -45,7 +45,7 @@
 <script setup lang="ts">
 const open = ref(true)
 
-const { acceptClarity, essential, isIdle } = useConsentManager()
+const { acceptClarity, essential, status } = useConsentManager()
 
 defineShortcuts({
   o: () => (open.value = !open.value)
@@ -54,10 +54,14 @@ defineShortcuts({
 const show = ref(false)
 const settingsOpen = ref(false)
 
-watchEffect(() => {
-  show.value = isIdle.value
-})
-
+watch(status, () => {
+	console.log(status)
+	if(status.value ===  'idle'){
+		show.value = true
+	}else{
+		show.value = false
+	}  
+},{ immediate: true })
 const categories = ref({
   essential: true, // immer true
   clarity: false
