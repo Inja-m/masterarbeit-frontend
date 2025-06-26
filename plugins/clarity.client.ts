@@ -1,21 +1,13 @@
 
 
-//export default defineNuxtPlugin(async () => {
-//	const { fetchUser } = useStrapiAuth()
-//  const consent = useCookie('cookie-consent')
-//  const hasConsent = computed(() => consent.value === 'clarity-consent')
+export default defineNuxtPlugin(async () => {
+  const consent = useCookie('cookie-consent')
+  const hasConsent = computed(() => consent.value === 'consent')
 
-//  if (import.meta.env.MODE === 'production' && hasConsent.value) {	
-//		console.log('window',window.clarityInitialized)
-//		if (!window.clarityInitialized) {
-//    const { proxy } = useScriptClarity({id: useRuntimeConfig().public.scripts.clarity.id})
-//		const user = await fetchUser()
-//		if(user?.value) proxy.clarity('identify', user?.value?.documentId)
-//			console.log('user',  user?.value?.documentId)
-//		window.clarityInitialized = true
-//    }
-//  } else {
-//    console.log('[Clarity Plugin] Clarity wird **nicht** geladen. ENV:', import.meta.env, 'Consent:', consent.value)
-//  }
-	
-//})
+  if (import.meta.env.MODE === 'production' && hasConsent.value) {	
+    const { proxy } = useScriptClarity({id: useRuntimeConfig().public.scripts.clarity.id})
+		proxy.clarity('consent')
+  } else {
+    console.log('[Clarity Plugin] Clarity wird **nicht** geladen. ENV:', import.meta.env, 'Consent:', consent.value)
+  }
+})
