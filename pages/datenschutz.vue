@@ -1,10 +1,6 @@
 <template>
 <Section>
 	
-<h1 class="wp-block-heading">Datenschutzerklärung</h1>
-
-
-
 <p>Personenbezogene Daten (nachfolgend zumeist nur „Daten“ genannt) werden von uns nur im Rahmen der Erforderlichkeit sowie zum Zwecke der Bereitstellung eines funktionsfähigen und nutzerfreundlichen Internetauftritts, inklusive seiner Inhalte und der dort angebotenen Leistungen, verarbeitet.</p>
 
 
@@ -129,3 +125,12 @@
 
 </Section>
 </template>
+<script setup lang="ts">
+definePageMeta({
+  header: {
+    title: 'Datenschutzerklärung',
+    back: true,
+    showHeader: true
+  }
+})
+</script>

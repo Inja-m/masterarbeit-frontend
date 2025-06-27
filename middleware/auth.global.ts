@@ -14,9 +14,7 @@ const { logout, fetchUser } = useStrapiAuth()
   if (to.path === '/login') {
 		if(user.value) await logout()
 		return
-	}
-	
-
+	}else if(to.path === '/datenschutz' || to.path === '/impressum' )	return
 
   if (!user.value) {
     return navigateTo('/login')

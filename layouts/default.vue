@@ -33,22 +33,36 @@ const router = useRouter()
 
 const isLoginPage = computed(() => route.path === '/login')
 const user = await useUserWithRole()
+const { find } = useStrapi()
 
 const isWorkshopRole = computed(() => {
-  return user.value.role.name === 'Workshop'
+  return user?.value?.role?.name === 'Workshop'
 })
 
 const metaHeader = computed(() => {
   const meta = route.meta?.header || {}
   return {
     title: meta.title ?? '',
-    back: meta.back ?? null,
+    back: meta.back ?? false,
     showHeader: meta.showHeader ?? false,
     showX: meta.showX ?? false
   }
 })
 
-function handleBack() {
-  router.push(metaHeader.value.back)
+async function handleBack() {
+	console.log(user)
+  if (window.history.length > 1) {
+    router.back()
+  } else if (user?.value?.role?.name === 'Workshop') {
+    const workshopParticipation = await find('participations', {
+      filters: { user: { id: user.value.id } },
+      populate: { workshop_group: { populate: ['workshop'] } }
+    })
+    navigateTo(
+      `/workshop/${workshopParticipation.data[0].workshop_group?.workshop?.documentId}`
+    )
+  } else {
+    router.push('/')
+  }
 }
 </script>

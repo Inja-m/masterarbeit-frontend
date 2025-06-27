@@ -15,3 +15,12 @@ E-Mail: <a href='mailto:inja@mainhardts.de'>inja@mainhardts.de</a>
 </Section>
  
 </template>
+<script setup lang="ts">
+definePageMeta({
+  header: {
+    title: 'Impressum',
+    back: true,
+    showHeader: true
+  }
+})
+</script>
