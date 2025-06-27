@@ -6,7 +6,6 @@ export const initClarity = async () => {
   const { proxy } = useScriptClarity({
     id: useRuntimeConfig().public.scripts.clarity.id
   })
-console.log(user)
 	watch(() => consent.value,
 				(newVal) => {
 					proxy.clarity('consent', computed(() => newVal === 'consent' ))
@@ -16,7 +15,6 @@ console.log(user)
 	watch(user, (newVal) => {
 		if (newVal) {
 			proxy.clarity('identify', newVal.documentId)
-			console.log('proxy', proxy)
 		}
 	}, { immediate: true })
 					
