@@ -21,7 +21,7 @@
       </footer>
     </div>
 
-    <BottomNavigation v-if="!isLoginPage && !isWorkshopRole" />
+    <BottomNavigation v-if="isPathNavigation() && !isWorkshopRole" />
   </div>
 </template>
 
@@ -31,7 +31,12 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
 
-const isLoginPage = computed(() => route.path === '/login')
+function isPathNavigation () {
+if(route.path === '/login'||route.path === '/impressum' ||route.path === '/datenschutz') return false
+return true
+}
+
+
 const user = await useUserWithRole()
 const { find } = useStrapi()
 
