@@ -1,6 +1,6 @@
 <template>
 	<Section>
-<h1>Impressum</h1><p>Angaben gemäß § 5 DDG</p><p>Inja Mainhardt<br> 
+<p>Angaben gemäß § 5 DDG</p><p>Inja Mainhardt<br> 
 <br> 
 Engenser Straße 6a<br> 
 30938 Burgwedel <br> 
