@@ -117,7 +117,7 @@ definePageMeta({
   name: 'workshop-details',
   header: {
     title: 'Co-Design Workshop',
-    back: null,
+    back: false,
     showHeader: true
   }
 })
@@ -139,7 +139,7 @@ onMounted(async () => {
   if (!isWorkshop.value) {
     route.meta.header = {
       title: 'Co-Design Workshop',
-      back: '/',
+      back: true,
       showHeader: true
     }
   }
