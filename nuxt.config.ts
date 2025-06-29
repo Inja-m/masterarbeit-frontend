@@ -35,8 +35,8 @@ export default defineNuxtConfig({
 			start_url: '/',
 			icons: [
         {
-          src: 'public/icons/icon_64x64.png',
-          sizes: '64x64',
+          src: 'public/icons/icon_512x512.png',
+          sizes: '512x512',
           type: 'image/png',
         },{
           src: 'public/icons/icon_192x192.png',

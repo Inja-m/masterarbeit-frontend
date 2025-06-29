@@ -7,6 +7,11 @@ const notifications = ref<UserNotification[]>([])
 export function useNotifications() {
 	onMounted(() => {
   fetchNotifications()
+	if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', (event) => {
+			fetchNotifications()
+    })
+  }
 })
   const { find, update } = useStrapi()
 	const { fetchUser } = useStrapiAuth()
