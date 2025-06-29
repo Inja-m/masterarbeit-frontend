@@ -1,7 +1,8 @@
 export default defineNuxtRouteMiddleware(async (to) => {
   // Seite /login überspringen    
 const { logout, fetchUser } = useStrapiAuth()
-  const user = useStrapiUser()
+const { find } = useStrapi()
+  const user = await  useUserWithRole()
 
   if (!user.value) {
     try {
@@ -11,6 +12,19 @@ const { logout, fetchUser } = useStrapiAuth()
       // Bei SSR: Kein Cookie oder ungültiges Token → kein User
     }
   }
+	if( user.value?.role?.name === 'Workshop' && to.path === '/'){
+		try {
+				const { data } = await find('participations', {
+					filters: { user: { id: { $eq: user.value.id } } },
+					populate: { workshop_group: { populate: ['workshop'] } }
+				})
+				return navigateTo(
+					`/workshop/${data[0].workshop_group?.workshop?.documentId}`
+				)
+			} catch (e) {
+				console.error('Login Workshop', e)
+			}
+	}
   if (to.path === '/login') {
 		if(user.value) await logout()
 		return
