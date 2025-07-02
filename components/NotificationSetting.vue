@@ -41,7 +41,7 @@ const value = ref<'all' | 'relevant' | 'off'>()
 const participationId = ref<number | null>(null)
 
 const isInitialized = ref(false)
-const isDrawerOpen = ref(true)
+const isDrawerOpen = ref(false)
 
 onMounted(async () => {
   const res = await find<Participation>('participations', {
@@ -94,7 +94,6 @@ watch(value, async (newVal) => {
       notification: newVal
     })
 		 isDrawerOpen.value = false
-		 console.log(isDrawerOpen.value)
   } catch (err) {
     console.error('Fehler beim Speichern der Benachrichtigung:', err)
   }
