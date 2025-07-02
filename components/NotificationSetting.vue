@@ -1,5 +1,5 @@
 <template>
-  <UDrawer :title="title">
+  <UDrawer v-model:open="isDrawerOpen" :title="title">
     <UButton color="neutral" variant="ghost"  @click="registerSubscription">
       <component :is="currentIcon" :size="22" stroke-width="2" />
     </UButton>
@@ -21,7 +21,7 @@
           </div>
         </template>
       </URadioGroup>
-			<LoginForm v-if="user?.role?.name === 'Workshop'" :isRegister="true" />
+			<LoginForm v-if="user?.role?.name === 'Workshop'" :isRegister="true" @close="isDrawerOpen = false"/>
     </template>
   </UDrawer>
 </template>
@@ -41,6 +41,7 @@ const value = ref<'all' | 'relevant' | 'off'>()
 const participationId = ref<number | null>(null)
 
 const isInitialized = ref(false)
+const isDrawerOpen = ref(true)
 
 onMounted(async () => {
   const res = await find<Participation>('participations', {
@@ -92,6 +93,8 @@ watch(value, async (newVal) => {
     await update<Participation>('participations', participationId.value, {
       notification: newVal
     })
+		 isDrawerOpen.value = false
+		 console.log(isDrawerOpen.value)
   } catch (err) {
     console.error('Fehler beim Speichern der Benachrichtigung:', err)
   }
