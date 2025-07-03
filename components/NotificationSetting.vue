@@ -21,7 +21,7 @@
           </div>
         </template>
       </URadioGroup>
-			<LoginForm v-if="user?.role?.name === 'Workshop'" :isRegister="true" @close="isDrawerOpen = false"/>
+			<LoginForm v-if="user?.role?.name === 'Workshop'" :isRegister="true" @close="() => { console.log('CLOSE EVENT'); loadParticipation() }"/>
     </template>
   </UDrawer>
 </template>
@@ -35,6 +35,7 @@ const props = defineProps<{
 }>()
 
 const { find, update } = useStrapi()
+const { fetchUser } = useStrapiAuth()
 const user = await useUserWithRole()
 
 const value = ref<'all' | 'relevant' | 'off'>()
@@ -44,19 +45,22 @@ const isInitialized = ref(false)
 const isDrawerOpen = ref(false)
 
 onMounted(async () => {
+	console.log(user.value)
   const res = await find<Participation>('participations', {
     filters: {
       user: { id: { $eq: user.value?.id } },
       workshop_group: { workshops: { id: { $eq: props.workshopId } } }
     }
   })
-
+	console.log('ausführen')
   if (res.data.length > 0) {
     const participation = res.data[0]
     participationId.value = participation.documentId
+		console.log('1', value.value)
     value.value = participation.notification
+		console.log('2', value.value)
   }
-	  isInitialized.value = true
+	isInitialized.value = true
 })
 // Dein Radio-Items
 const items = [
@@ -75,6 +79,7 @@ const currentIcon = computed(() => {
   return items.find((i) => i.value === value.value)?.icon
 })
 const registerSubscription = async () => {
+	console.log(user.value)
 	if(user.value.role.name !== 'Workshop'){
 		try {
 		await useRegisterSubscription()
@@ -84,12 +89,20 @@ const registerSubscription = async () => {
 	}
   
 }
+async function loadParticipation() {
+		console.log( user.value)
+	isDrawerOpen.value = false
+	location.reload()
+
+}
 
 // Speichern bei Änderung
 watch(value, async (newVal) => {
+	console.log(user?.value?.role?.name)
 	if(user?.value?.role?.name === 'Workshop') return
   if (!participationId.value || !isInitialized.value ) return
   try {
+		console.log(participationId.value)
     await update<Participation>('participations', participationId.value, {
       notification: newVal
     })
