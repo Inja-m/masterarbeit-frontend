@@ -121,7 +121,8 @@
       >
         <div class="text-xs">
           Voraussichtlicher Abschluss: KW
-          {{ getISOWeek(steps[activeStep]?.estimatedCompletion)?.week }}
+          {{ getISOWeek(steps[activeStep]?.estimatedCompletion)?.week }} /
+					{{ getISOWeek(steps[activeStep]?.estimatedCompletion)?.month }}
           {{ getISOWeek(steps[activeStep]?.estimatedCompletion)?.year }}
         </div>
       </template>
