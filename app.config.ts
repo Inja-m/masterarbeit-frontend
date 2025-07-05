@@ -12,7 +12,7 @@ export default defineAppConfig({
 		carousel: {
       slots: {
 				dots: '-bottom-6 gap-',
-				dot: 'size-2'
+				dot: 'size-2 bg-default'
 			}
 		},
     stepper: {
