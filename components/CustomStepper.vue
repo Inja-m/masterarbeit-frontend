@@ -22,7 +22,7 @@
             <div
               class="flex items-center justify-center w-8 h-8 md:w-12 md:h-12 rounded-full transition-all"
               :class="[
-                getStepColorClass(steps[index].evaluationStatus),
+                getStepColorClass(steps[index]?.evaluationStatus),
                 index === activeStep
                   ? 'outline outline-2 outline-inverted outline-offset-2'
                   : ''
@@ -35,15 +35,14 @@
               />
             </div>
             <div class="text-xs mt-1 text-center text-muted">
-              {{ getStatusLabel(steps[index].evaluationStatus) }}
+              {{ getStatusLabel(steps[index]?.evaluationStatus) }}
             </div>
           </div>
 
           <!-- Trennlinie, außer beim letzten -->
           <div
             v-if="index < steps.length - 1"
-            class="flex-grow bg-inverted mx-1 md:mx-2"
-            :class="index < completedStep ? 'h-[1.0px]' : 'h-[1.0px]'"
+            class="flex-grow bg-inverted mx-1 md:mx-2 h-[1.0px]"
           />
         </div>
       </template>
@@ -62,37 +61,37 @@
         class="prose max-w-none"
       />
 
-      <div v-if="steps[activeStep].evaluationStatus === 'done'" class="mt-4">
+      <div v-if="steps[activeStep]?.evaluationStatus === 'done'" class="mt-4">
         <div v-if="!isWorkshop">
           <Digitisation
-            v-if="steps[activeStep].identifier === 'digitalisation'"
-            :result="steps[activeStep].result"
+            v-if="steps[activeStep]?.identifier === 'digitalisation'"
+            :result="steps[activeStep]?.result"
           />
           <Qualitative
             v-else-if="
-              steps[activeStep].identifier === 'qualitative' &&
+              steps[activeStep]?.identifier === 'qualitative' &&
               userStories.data &&
               userStories.data.length > 0
             "
             :result="userStories.data"
           />
 
-          <template v-else-if="steps[activeStep].identifier === 'publication'">
+          <template v-else-if="steps[activeStep]?.identifier === 'publication'">
             <h2>Veröffentlichte Materialien</h2>
-            <EvaluationStep :result="steps[activeStep].result" />
+            <EvaluationStep :result="steps[activeStep]?.result" />
           </template>
 
           <template v-else>
-            <TextBlock :result="steps[activeStep].result" />
-            <EvaluationStep :result="steps[activeStep].result" />
+            <TextBlock :result="steps[activeStep]?.result" />
+            <EvaluationStep :result="steps[activeStep]?.result" />
           </template>
           <TextBlock
             v-if="
               ['digitalisation', 'qualitative', 'publication'].includes(
-                steps[activeStep].identifier
+                steps[activeStep]?.identifier
               ) === true
             "
-            :result="steps[activeStep].result"
+            :result="steps[activeStep]?.result"
           />
         </div>
         <div v-if="isWorkshop">
@@ -116,14 +115,14 @@
       <template
         #footer
         v-if="
-          steps[activeStep].evaluationStatus !== 'done' &&
-          steps[activeStep].estimatedCompletion
+          steps[activeStep]?.evaluationStatus !== 'done' &&
+          steps[activeStep]?.estimatedCompletion
         "
       >
         <div class="text-xs">
           Voraussichtlicher Abschluss: KW
-          {{ getISOWeek(steps[activeStep].estimatedCompletion).week }}
-          {{ getISOWeek(steps[activeStep].estimatedCompletion).year }}
+          {{ getISOWeek(steps[activeStep]?.estimatedCompletion)?.week }}
+          {{ getISOWeek(steps[activeStep]?.estimatedCompletion)?.year }}
         </div>
       </template>
     </UCard>
@@ -149,8 +148,8 @@ const activeStep = ref(0)
 
 const props = defineProps<{
   steps: { name: string; description: string; icon: string }[]
-  completedStep: number
 }>()
+
 function findActiveStep(steps) {
   // 1. Schritt mit 'inProgress'
   const inProgressIndex = steps.findIndex(s => s.evaluationStatus === 'inProgress')

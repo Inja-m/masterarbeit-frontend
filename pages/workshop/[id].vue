@@ -62,7 +62,7 @@
   </template>
 		</UAccordion>
 			</Section>
-    <div class="mb-4 mx-2">
+    <div v-if="orderedSteps?.length" class="mb-4 mx-2">
       <CustomStepper :steps="orderedSteps" :completed-step="completedStep" />
     </div>
 
@@ -143,12 +143,18 @@ const state = reactive({
 
 onMounted(async () => {
   loadMessages()
+	loadEvaluationSteps()
   if (!isWorkshop.value) {
     route.meta.header = {
       title: 'Co-Design Workshop',
       back: true,
       showHeader: true
     }
+  }
+	if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', async (event) => {
+			loadEvaluationSteps()
+    })
   }
 })
 
@@ -191,61 +197,9 @@ const resWorkshopResults = await find<WorkshopResult>('workshop-results', {
   }
 })
 
-useHead({
-  title: resWorkshop.data.workshop_serie.name
-})
-
-const userParticipationRes = await find('participations', {
-  filters: {
-    user: {
-      id: { $eq: user.value.id }
-    }
-  },
-  populate: {
-    workshop_group: {
-      populate: ['workshop']
-    }
-  }
-})
-
-const userParticipation = userParticipationRes.data.find(
-  (p) => p.workshop_group?.workshop?.documentId === workshopID
-)
-
-const userGroupId = userParticipation.workshop_group.documentId
-
-const filteredResults = resWorkshopResults.data
-  .map((result) => {
-    const filteredComponents = result.Result.filter((component) => {
-      return (
-        component.__component === 'media.totality' &&
-        (!component.workshop_group || // keine Workshop-Gruppe zugewiesen
-          component.workshop_group.documentId === userGroupId)
-      )
-    })
-
-    return {
-      ...result,
-      Result: filteredComponents
-    }
-  })
-  .filter(
-    (result) => result.Result.length > 0 || result.evaluationStatus !== 'to do'
-  )
-
-const stepsWithStatus = computed(() => {
-  return resWorkshop.data.workshop_serie.evaluation_steps.map((step: any) => {
-    const result = filteredResults.find(
-      (r: any) => r.evaluation_step.id === step.id
-    )
-    return {
-      ...step,
-      evaluationStatus: result?.evaluationStatus,
-			estimatedCompletion: result?.estimatedCompletion,
-      result: result?.Result
-    }
-  })
-})
+const userGroupId = ref<string>()
+const filteredResults = ref<any[]>([])
+const stepsWithStatus = ref<any[]>([])
 
 const orderedSteps = computed(() => {
   const order = { done: 0, inProgress: 1, todo: 2 }
@@ -261,6 +215,64 @@ const completedStep = computed(() =>
     (step: any) => step.evaluationStatus === 'done'
   )
 )
+
+async function loadEvaluationSteps() {
+	if (!resWorkshop.data.workshop_serie?.evaluation_steps) {
+  console.warn('Keine evaluation_steps im Workshop vorhanden:', resWorkshop.data)
+}
+console.log('hier')
+  const userParticipationRes = await find('participations', {
+    filters: {
+      user: { id: { $eq: user.value.id } }
+    },
+    populate: {
+      workshop_group: {
+        populate: ['workshop']
+      }
+    }
+  })
+
+  const userParticipation = userParticipationRes.data.find(
+    (p) => p.workshop_group?.workshop?.documentId === workshopID
+  )
+
+  if (!userParticipation) return
+
+  userGroupId.value = userParticipation.workshop_group.documentId
+
+  const filtered = resWorkshopResults.data
+    .map((result) => {
+      const filteredComponents = result.Result.filter((component) => {
+        return (
+          component.__component === 'media.totality' &&
+          (!component.workshop_group ||
+            component.workshop_group.documentId === userGroupId.value)
+        )
+      })
+
+      return {
+        ...result,
+        Result: filteredComponents
+      }
+    })
+    .filter(
+      (result) => result.Result.length > 0 || result.evaluationStatus !== 'to do'
+    )
+
+  filteredResults.value = filtered
+
+  stepsWithStatus.value = resWorkshop.data.workshop_serie.evaluation_steps.map((step: any) => {
+    const result = filtered.find(
+      (r: any) => r.evaluation_step.id === step.id
+    )
+    return {
+      ...step,
+      evaluationStatus: result?.evaluationStatus ?? 'todo',
+      estimatedCompletion: result?.estimatedCompletion,
+      result: result?.Result
+    }
+  })
+}
 
 async function loadMessages() {
   try {
