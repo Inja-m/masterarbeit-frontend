@@ -10,7 +10,6 @@
               <UButton
                 icon="i-lucide-download"
                 :label="`${item.label} herunterladen`"
-                size="sm"
                 color="neutral"
                 variant="ghost"
                 :href="getImageUrl(image)"
@@ -35,7 +34,6 @@
             :key="linkItem.id"
             icon="i-lucide-external-link"
             :label="linkItem.link"
-            size="sm"
             color="neutral"
             variant="ghost"
             :href="linkItem.link"

@@ -41,7 +41,6 @@
           <UButton
             icon="i-lucide-download"
             :label="image.name"
-            size="sm"
             color="neutral"
             variant="ghost"
             :href="getImageUrl(image)"

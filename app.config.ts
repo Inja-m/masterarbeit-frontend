@@ -1,5 +1,20 @@
 export default defineAppConfig({
   ui: {
+		input:{
+			defaultVariants: {
+        size: 'lg'
+			}
+		},
+		select:{
+			defaultVariants: {
+        size: 'lg'
+			}
+		},
+		button:{
+			defaultVariants: {
+        size: 'lg'
+			}
+		},
 		alert: {
 			variants: {
 				orientation: {

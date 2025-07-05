@@ -22,7 +22,6 @@
       <UButton
         icon="i-lucide-eye"
         label="Artefakte ansehen"
-        size="sm"
         color="neutral"
         variant="solid"
       />

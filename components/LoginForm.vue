@@ -24,7 +24,7 @@
 				<UInput v-model="state.password" :type="show ? 'text' : 'password'" placeholder="Passwort"
 					:ui="{ trailing: 'pe-1' }" class="w-full">
 					<template #trailing>
-						<UButton color="neutral" variant="link" size="sm" :icon="show ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+						<UButton color="neutral" variant="link" :icon="show ? 'i-lucide-eye-off' : 'i-lucide-eye'"
 							:aria-label="show ? 'Passwort ausblenden' : 'Passwort anzeigen'" @click="show = !show" />
 					</template>
 				</UInput>
@@ -44,7 +44,7 @@
 		<template #footer>
 			<p class="text-sm text-center text-gray-500 dark:text-gray-400">
 				{{ isRegister ? 'Schon ein Konto?' : 'Noch kein Konto?' }}
-				<UButton variant="link" @click="isRegister = !isRegister" size="sm">
+				<UButton variant="link" @click="isRegister = !isRegister">
 					{{ isRegister ? 'Einloggen' : 'Registrieren' }}
 				</UButton>
 			</p>
