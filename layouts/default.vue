@@ -11,7 +11,7 @@
       <main>
         <slot />
       </main>
-      <footer class="flex items-end text-center text-xs text-gray-500 py-3">
+      <footer v-if="!isPathNavigation() || isWorkshopRole || isPathProfile()" class="flex items-end text-center text-xs text-gray-500 py-3">
         <UContainer class="flex flex-wrap items-end justify-center gap-4">
           <NuxtLink to="/datenschutz" class="hover:underline"
             >Datenschutz</NuxtLink
@@ -34,6 +34,11 @@ const router = useRouter()
 function isPathNavigation () {
 if(route.path === '/login'||route.path === '/impressum' ||route.path === '/datenschutz') return false
 return true
+}
+
+function isPathProfile () {
+if(route.path === '/profile') return true
+return false
 }
 
 
