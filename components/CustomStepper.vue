@@ -6,7 +6,7 @@
     >
       <template v-for="(step, index) in steps" :key="index">
         <div
-          class="flex items-center"
+          class="flex items-baseline"
           :class="{ 'flex-1': index < steps.length - 1 }"
         >
           <!-- Step Icon -->
@@ -17,11 +17,9 @@
             <div
               class="flex items-center justify-center w-8 h-8 md:w-12 md:h-12 rounded-full transition-all"
               :class="[
-                index <= completedStep
-                  ? 'bg-inverted text-inverted'
-                  : 'border text-toned',
+                getStepColorClass(steps[index].evaluationStatus),
                 index === activeStep
-                  ? 'outline outline-2 outline-primary outline-offset-2'
+                  ? 'outline outline-2 outline-neutal outline-offset-2'
                   : ''
               ]"
             >
@@ -31,13 +29,16 @@
                 stroke-width="2"
               />
             </div>
+            <div class="text-xs mt-1 text-center text-muted">
+              {{ getStatusLabel(steps[index].evaluationStatus) }}
+            </div>
           </div>
 
           <!-- Trennlinie, außer beim letzten -->
           <div
             v-if="index < steps.length - 1"
             class="flex-grow bg-inverted mx-1 md:mx-2"
-            :class="index < completedStep ? 'h-[1.5px]' : 'h-[0.5px]'"
+            :class="index < completedStep ? 'h-[0.5px]' : 'h-[0.5px]'"
           />
         </div>
       </template>
@@ -48,20 +49,6 @@
       <template #header>
         <div class="flex items-center justify-between">
           <h1>{{ activeStep + 1 }}. {{ steps[activeStep].name }}</h1>
-          <UBadge
-            :color="getStatusColor(steps[activeStep].evaluationStatus)"
-            variant="outline"
-            size="sm"
-            class="font-normal rounded-full whitespace-nowrap"
-          >
-            {{
-              steps[activeStep].evaluationStatus === 'done'
-                ? 'Abgeschlossen'
-                : steps[activeStep].evaluationStatus === 'inProgress'
-                ? 'In Bearbeitung'
-                : 'Ausstehend'
-            }}
-          </UBadge>
         </div>
       </template>
       <div
@@ -93,7 +80,14 @@
             <TextBlock :result="steps[activeStep].result" />
             <EvaluationStep :result="steps[activeStep].result" />
           </template>
-					<TextBlock  v-if="['digitalisation', 'qualitative', 'publication'].includes(steps[activeStep].identifier) === true" :result="steps[activeStep].result" />
+          <TextBlock
+            v-if="
+              ['digitalisation', 'qualitative', 'publication'].includes(
+                steps[activeStep].identifier
+              ) === true
+            "
+            :result="steps[activeStep].result"
+          />
         </div>
         <div v-if="isWorkshop">
           <UAlert color="neutral" variant="subtle">
@@ -147,11 +141,24 @@ const isWorkshop = computed(() => user.value?.role?.name === 'Workshop')
 const userStories = ref(null)
 const activeStep = ref(0)
 
-defineProps<{
+const props = defineProps<{
   steps: { name: string; description: string; icon: string }[]
   completedStep: number
 }>()
+function findActiveStep(steps) {
+  // 1. Schritt mit 'inProgress'
+  const inProgressIndex = steps.findIndex(s => s.evaluationStatus === 'inProgress')
+  if (inProgressIndex !== -1) return inProgressIndex
 
+  // 2. letzter Schritt mit 'done'
+  const doneIndices = steps
+    .map((s, i) => s.evaluationStatus === 'done' ? i : -1)
+    .filter(i => i !== -1)
+  if (doneIndices.length > 0) return Math.max(...doneIndices)
+
+  // 3. fallback erster Schritt
+  return 0
+}
 function getIconComponent(component: string) {
   return (
     LucideIcons[component as keyof typeof LucideIcons] || LucideIcons.HelpCircle
@@ -162,36 +169,45 @@ function setActive(index: number) {
   activeStep.value = index
 }
 
-function getStatusColor(status: string) {
+function getStepColorClass(status: string) {
   switch (status) {
     case 'done':
-      return 'success'
+      return 'border bg-green-300 dark:text-inverted'
     case 'inProgress':
-      return 'info'
+      return 'border bg-blue-300 dark:text-inverted'
     default:
-      return 'warning'
+      return 'border bg-yellow-100 dark:text-inverted'
   }
 }
-
-watch(
-		() => user.value?.id,
-		async (newId, oldId) => {
-			console.log('watch')
-			if (newId && newId !== oldId) {
-					if (!isWorkshop.value) {
-    userStories.value = await find('user-stories', {
-      filters: {
-        workshop: {
-          documentId: {
-            $eq: workshopID
-          }
-        }
-      },
-      populate: '*'
-    })
+function getStatusLabel(status: string) {
+  switch (status) {
+    case 'done':
+      return 'Erledigt'
+    case 'inProgress':
+      return 'Laufend'
+    default:
+      return 'Offen'
   }
-			}
-		},
-		{ immediate: true }
-	)
+}
+watch(
+  () => user.value?.id,
+  async (newId, oldId) => {
+    if (newId && newId !== oldId) {
+			activeStep.value = findActiveStep(props.steps)
+      if (!isWorkshop.value) {
+        userStories.value = await find('user-stories', {
+          filters: {
+            workshop: {
+              documentId: {
+                $eq: workshopID
+              }
+            }
+          },
+          populate: '*'
+        })
+      }
+    }
+  },
+  { immediate: true }
+)
 </script>
