@@ -38,6 +38,11 @@ useHead({
 })
 definePageMeta({
   name: 'home',
+	header: {
+    title: 'Teilgenommene Workshops',
+    back: false,
+    showHeader: true
+  }
 })
 
 const overlay = useOverlay()
