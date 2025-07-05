@@ -24,7 +24,7 @@
         label="Artefakte ansehen"
         size="sm"
         color="neutral"
-        variant="outline"
+        variant="solid"
       />
       <template #body>
         <UCarousel

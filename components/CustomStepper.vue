@@ -24,7 +24,7 @@
               :class="[
                 getStepColorClass(steps[index].evaluationStatus),
                 index === activeStep
-                  ? 'outline outline-2 outline-neutal outline-offset-2'
+                  ? 'outline outline-2 outline-inverted outline-offset-2'
                   : ''
               ]"
             >
@@ -43,7 +43,7 @@
           <div
             v-if="index < steps.length - 1"
             class="flex-grow bg-inverted mx-1 md:mx-2"
-            :class="index < completedStep ? 'h-[0.5px]' : 'h-[0.5px]'"
+            :class="index < completedStep ? 'h-[1.0px]' : 'h-[1.0px]'"
           />
         </div>
       </template>
