@@ -21,7 +21,7 @@
           </div>
         </template>
       </URadioGroup>
-			<LoginForm v-if="user?.role?.name === 'Workshop'" :isRegister="true"/>
+			<LoginForm v-if="user?.role?.name === 'Workshop'" :isRegister="true" @close="onLoginFormClose"/>
     </template>
   </UDrawer>
 </template>
@@ -43,9 +43,15 @@ const participationId = ref<number | null>(null)
 const isInitialized = ref(false)
 const isDrawerOpen = ref(false)
 
+function onLoginFormClose() {
+	participationId.value = null
+	isInitialized.value = false
+  setTimeout(() => {
+    registerSubscription()
+  }, 1000)
+}
 onMounted(async () => {
   loadParticipation()
-	isInitialized.value = true
 })
 // Dein Radio-Items
 const items = [
@@ -64,7 +70,6 @@ const currentIcon = computed(() => {
   return items.find((i) => i.value === value.value)?.icon
 })
 const registerSubscription = async () => {
-	console.log(user.value)
 	if(user.value.role.name !== 'Workshop'){
 		try {
 		await useRegisterSubscription()
@@ -72,7 +77,6 @@ const registerSubscription = async () => {
     console.error('Fehler beim Registrieren der Subscription:', error)
   }
 	}
-  
 }
 
 async function loadParticipation() {
@@ -87,12 +91,18 @@ async function loadParticipation() {
     participationId.value = participation.documentId
     value.value = participation.notification
   }
+	isInitialized.value = true
 }
 
 // Speichern bei Änderung
-watch(value, async (newVal) => {
+watch(value, async (newVal, oldVal) => {
+	console.log(newVal, oldVal)
 	if(user?.value?.role?.name === 'Workshop') return
-  if (!participationId.value || !isInitialized.value ) return
+  if (!participationId.value || !isInitialized.value ) {
+		value.value = oldVal
+		isDrawerOpen.value = true
+		console.log(oldVal)
+	}
   try {
     await update<Participation>('participations', participationId.value, {
       notification: newVal
