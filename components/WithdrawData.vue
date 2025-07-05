@@ -41,9 +41,11 @@
         </div>
       </UForm>
 
-      <UAlert
+      <UModal v-model:open="showModal" title="Daten löschen?">
+        <template #body>
+					<UAlert
         v-if="verified"
-        color="warning"
+        color="error"
         variant="subtle"
         icon="i-lucide-alert-circle"
         class="mb-4"
@@ -51,12 +53,9 @@
         <template #title>Hinweis zum Datenrückzug</template>
         <template #description>
           Durch das Zurückziehen werden deine Daten dauerhaft gelöscht und nicht in der Auswertung verwendet.
-          Bei Gruppenarbeiten wird die gesamte Gruppenarbeit entfernt.
+          <span class="font-semibold ">Bei Gruppenarbeiten wird die gesamte Gruppenarbeit entfernt.</span>
         </template>
       </UAlert>
-
-      <UModal v-model:open="showModal" title="Daten löschen?">
-        <template #body>
           <p>
             Möchtest du wirklich deine Daten entfernen? Diese Aktion kann nicht rückgängig gemacht werden.
           </p>
@@ -72,7 +71,7 @@
       </UModal>
     </template>
 
-    <template #footer>
+    <!--<template #footer>
       <UButton
         v-if="verified"
         label="Daten jetzt zurückziehen"
@@ -80,7 +79,7 @@
         class="w-full flex justify-center items-center"
         @click="confirmWithdraw"
       />
-    </template>
+    </template>-->
   </BaseModalAction>
 </template>
 
@@ -135,6 +134,7 @@ async function onSubmit(_event: FormSubmitEvent<typeof state>) {
   if (isValid) {
     verified.value = true
     errors.code = undefined
+		showModal.value = true
   } else {
     verified.value = false
     errors.code = 'Code ungültig'
