@@ -21,7 +21,7 @@
           </div>
         </template>
       </URadioGroup>
-			<LoginForm v-if="user?.role?.name === 'Workshop'" :isRegister="true" @close="isDrawerOpen = false"/>
+			<LoginForm v-if="user?.role?.name === 'Workshop'" :isRegister="true"/>
     </template>
   </UDrawer>
 </template>
@@ -97,7 +97,7 @@ watch(value, async (newVal) => {
     await update<Participation>('participations', participationId.value, {
       notification: newVal
     })
-		 isDrawerOpen.value = false
+		isDrawerOpen.value = false
   } catch (err) {
     console.error('Fehler beim Speichern der Benachrichtigung:', err)
   }
