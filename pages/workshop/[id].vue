@@ -55,10 +55,11 @@
           </div>
 			</template>
 		</UAccordion>
-    <div class="my-4 mx-2">
+			</Section>
+    <div class="mb-4 mx-2">
       <CustomStepper :steps="orderedSteps" :completed-step="completedStep" />
     </div>
-  </Section>
+
   <Section bg-color="bg-primary-100" class="light text-default">
     <h1 class="pb-4">Wir freuen uns über einen weiteren Austausch</h1>
     <UForm :state="state" class="pb-4" @submit="onSubmit">

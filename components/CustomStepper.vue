@@ -1,8 +1,13 @@
 <template>
   <div class="w-full">
+		<div class="bg-accented rounded-lg p-4 mb-2">
+		 <h1>Status der Workshop-Auswertung</h1>
+  <p class="text-sm text-muted mb-6">
+    Verfolge hier den aktuellen Status der einzelnen Auswertungsschritte.
+  </p>
     <!-- Stepper Kopf mit Icons und Trennlinien -->
     <div
-      class="flex items-center justify-between bg-accented rounded-lg p-4 mb-2"
+      class="flex items-center justify-between"
     >
       <template v-for="(step, index) in steps" :key="index">
         <div
@@ -43,6 +48,7 @@
         </div>
       </template>
     </div>
+	</div>
 
     <!-- Content -->
     <UCard variant="soft">
