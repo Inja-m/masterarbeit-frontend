@@ -173,8 +173,12 @@ function getStatusColor(status: string) {
   }
 }
 
-onMounted(async () => {
-  if (!isWorkshop.value) {
+watch(
+		() => user.value?.id,
+		async (newId, oldId) => {
+			console.log('watch')
+			if (newId && newId !== oldId) {
+					if (!isWorkshop.value) {
     userStories.value = await find('user-stories', {
       filters: {
         workshop: {
@@ -186,5 +190,8 @@ onMounted(async () => {
       populate: '*'
     })
   }
-})
+			}
+		},
+		{ immediate: true }
+	)
 </script>
