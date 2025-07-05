@@ -1,5 +1,20 @@
 export default defineAppConfig({
   ui: {
+		switch:{
+			defaultVariants: {
+        size: 'lg'
+			}
+		},
+		checkbox:{
+			defaultVariants: {
+        size: 'lg'
+			}
+		},
+		textarea:{
+			defaultVariants: {
+        size: 'lg'
+			},
+		},
 		input:{
 			defaultVariants: {
         size: 'lg'
