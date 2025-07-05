@@ -20,40 +20,46 @@
     <h1 class="py-2">
       {{ resWorkshop.data.workshop_serie.name }}
     </h1>
+		
     <IconText :icon="Calendar" :text="formatDate(resWorkshop.data.date)" />
     <IconText :icon="MapPin" :text="resWorkshop.data.location" />
     <div v-if="resWorkshop.data.reward">
       <IconText :icon="HandCoins" :text="resWorkshop.data.reward" />
     </div>
-		<UAccordion :items="items">
-			<template #body>
-				 {{ resWorkshop.data.workshop_serie.description }} 
-				   <div v-for="image in resWorkshop.data.workshop_serie.material" :key="image.id">
-            <!-- Link anzeigen, wenn vorhanden -->
-            <!-- PDF -->
-            <div v-if="image.mime === 'application/pdf'">
-              <UButton
-                icon="i-lucide-download"
-								:label="image.name"
-                size="sm"
-                color="neutral"
-                variant="ghost"
-                :href="getImageUrl(image)"
-                target="_blank"
-                download
-              />
-            </div>
+		<UAccordion :items="items" :ui="{ item: 'border-b-0', label: 'text-base font-normal', trigger:'py-1 gap-3', leadingIcon: 'shrink-0 size-6 text-lg' }" >
+			<template #body="{ item }">
+				<div v-if="item.label === 'Beschreibung'">
+      {{ resWorkshop.data.workshop_serie.description }}
+				</div>
+				<div v-else>
+					<p>
+        Hier findest du alle allgemeinen Workshop-Materialien und Vorlagen, wie z. B. die Datenschutzerklärung oder Informationsblätter. 
+				Persönliche Daten oder individuelle Ausfüllungen sind darin nicht enthalten.
+      </p>
+      <div v-for="image in resWorkshop.data.workshop_serie.material" :key="image.id">
+        <div v-if="image.mime === 'application/pdf'">
+          <UButton
+            icon="i-lucide-download"
+            :label="image.name"
+            size="sm"
+            color="neutral"
+            variant="ghost"
+            :href="getImageUrl(image)"
+            target="_blank"
+            download
+          />
+        </div>
+        <div v-else>
+          <img
+            :src="getImageUrl(image)"
+            :alt="image.name"
+            class="rounded"
+          />
+        </div>
+      </div>
+				</div>
 
-            <!-- Bild -->
-            <div v-else>
-              <img
-                :src="getImageUrl(image)"
-                :alt="image.name"
-                class="rounded"
-              >
-            </div>
-          </div>
-			</template>
+  </template>
 		</UAccordion>
 			</Section>
     <div class="mb-4 mx-2">
@@ -151,8 +157,12 @@ const resWorkshop = await findOne<Workshop>('workshops', workshopID, {
 })
 const items = ref<AccordionItem[]>([
   {
-    label: 'Weitere Informationen',
+    label: 'Beschreibung',
     icon: 'i-lucide-scroll-text'
+  },
+	{
+    label: 'Materialien',
+    icon: 'i-lucide-folder-open'
   }
 ])
 const resWorkshopResults = await find<WorkshopResult>('workshop-results', {
