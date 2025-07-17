@@ -26,7 +26,7 @@
     <div v-if="resWorkshop.data.reward">
       <IconText :icon="HandCoins" :text="resWorkshop.data.reward" />
     </div>
-		<UAccordion :items="items" :ui="{ item: 'border-b-0', label: 'text-base font-normal', trigger:'py-1 gap-3', leadingIcon: 'shrink-0 size-6 text-lg' }" >
+		<UAccordion  type="multiple" :items="items" :ui="{ item: 'border-b-0', label: 'text-base font-normal', trigger:'py-1 gap-3', leadingIcon: 'shrink-0 size-6 text-lg' }" >
 			<template #body="{ item }">
 				<div v-if="item.label === 'Beschreibung'">
       {{ resWorkshop.data.workshop_serie.description }}

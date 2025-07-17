@@ -1,5 +1,10 @@
 export default defineAppConfig({
-  ui: {
+  ui: {	
+		button:{
+			defaultVariants: {
+        size: 'lg'
+			}
+		},
 		switch:{
 			defaultVariants: {
         size: 'lg'
@@ -25,11 +30,7 @@ export default defineAppConfig({
         size: 'lg'
 			}
 		},
-		button:{
-			defaultVariants: {
-        size: 'lg'
-			}
-		},
+	
 		alert: {
 			variants: {
 				orientation: {
@@ -42,7 +43,7 @@ export default defineAppConfig({
 		carousel: {
       slots: {
 				dots: '-bottom-6 gap-',
-				dot: 'size-2 bg-default'
+				dot: 'size-2 bg-muted'
 			}
 		},
     stepper: {
