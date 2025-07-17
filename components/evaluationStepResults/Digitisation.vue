@@ -22,8 +22,7 @@
       <UButton
         icon="i-lucide-eye"
         label="Artefakte ansehen"
-        color="neutral"
-        variant="solid"
+        color="primary"
       />
       <template #body>
         <UCarousel

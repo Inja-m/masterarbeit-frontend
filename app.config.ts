@@ -43,7 +43,7 @@ export default defineAppConfig({
 		carousel: {
       slots: {
 				dots: '-bottom-6 gap-',
-				dot: 'size-2 bg-muted'
+				dot: 'size-2'
 			}
 		},
     stepper: {

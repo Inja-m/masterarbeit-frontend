@@ -3,9 +3,10 @@
   <UCarousel 
     v-slot="{ item }"
     :items="result"
-    class="w-full max-w-2xl mx-auto my-4 light"
+    class="w-full max-w-2xl mx-auto my-4"
     dots
     loop
+		:ui="{dot: 'bg-default'}"
   >
     <UCard class="h-40 flex flex-col justify-between p-4 dark text-default text-sm">
       <p>
