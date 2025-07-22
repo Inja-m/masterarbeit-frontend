@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-screen">
+  <div class="flex flex-col h-svh">
     <HeaderTitle
       v-if="metaHeader.showHeader"
       :title="metaHeader.title"
@@ -7,8 +7,8 @@
       :show-x="metaHeader.showX"
       @back="handleBack"
     />
-    <div class="grow overflow-y-auto flex flex-col justify-between">
-      <main>
+    <div class="grow flex flex-col justify-between overflow-y-hidden  w-full">
+      <main class="overflow-y-auto">
         <slot />
       </main>
       <footer v-if="!isPathNavigation() || isWorkshopRole || isPathProfile()" class="flex items-end text-center text-xs text-gray-500 py-3">
@@ -20,7 +20,6 @@
         </UContainer>
       </footer>
     </div>
-
     <BottomNavigation v-if="isPathNavigation() && !isWorkshopRole" />
   </div>
 </template>

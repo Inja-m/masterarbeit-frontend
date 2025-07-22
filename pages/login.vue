@@ -1,5 +1,5 @@
 <template>
-  <Section class="min-h-screen flex items-center justify-center" >
+  <Section class="min-h-svh flex items-center justify-center">
       <UTabs
         :items="items"
         variant="link"
