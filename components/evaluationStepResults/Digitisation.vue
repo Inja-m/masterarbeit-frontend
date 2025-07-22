@@ -29,7 +29,6 @@
           v-slot="{ item }"
           loop
           dots
-					auto-height
           :items="carouselItems"
 					:ui="{
 						dot: 'w-3 h-1',
