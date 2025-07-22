@@ -29,7 +29,12 @@
           v-slot="{ item }"
           loop
           dots
+					auto-height
           :items="carouselItems"
+					:ui="{
+						container: 'transition-[height]',
+						dots: '-top-7',
+					}"
           class="w-full max-w-xs mx-auto mb-6"
         >
           <h2 class="flex justify-center">{{ item.title }}</h2>
