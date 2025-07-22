@@ -39,7 +39,7 @@
           class="w-full max-w-xs mx-auto mb-6"
         >
           <h2 class="flex justify-center">{{ item.title }}</h2>
-          <img :src="item.src" width="320" height="320" class="rounded-lg" >
+          <img :src="item.src" class="rounded-lg" >
 					<div v-if="item.description" v-html="marked(item.description)" class="prose max-w-none mt-2" />
         </UCarousel>
       </template>
