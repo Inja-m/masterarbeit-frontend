@@ -33,6 +33,7 @@
           :items="carouselItems"
 					:ui="{
 						container: 'transition-[height]',
+						controls: 'absolute -top-8 inset-x-12',
 						dots: '-top-7',
 					}"
           class="w-full max-w-xs mx-auto mb-6"
