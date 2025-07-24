@@ -43,6 +43,8 @@ export default defineAppConfig({
 		carousel: {
       slots: {
 				dots: '-bottom-6 gap-',
+				 prev: 'absolute rounded-full bg-accented',
+        next: 'absolute rounded-full bg-accented',
 				dot: 'size-2'
 			}
 		},

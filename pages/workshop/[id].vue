@@ -20,53 +20,103 @@
     <h1 class="py-2">
       {{ resWorkshop.data.workshop_serie.name }}
     </h1>
-		
+
     <IconText :icon="Calendar" :text="formatDate(resWorkshop.data.date)" />
     <IconText :icon="MapPin" :text="resWorkshop.data.location" />
     <div v-if="resWorkshop.data.reward">
       <IconText :icon="HandCoins" :text="resWorkshop.data.reward" />
     </div>
-		<UAccordion  type="multiple" :items="items" :ui="{ item: 'border-b-0', label: 'text-base font-normal', trigger:'py-1 gap-3', leadingIcon: 'shrink-0 size-6 text-lg' }" >
-			<template #body="{ item }">
-				<div v-if="item.label === 'Beschreibung'">
-      {{ resWorkshop.data.workshop_serie.description }}
-				</div>
-				<div v-else>
-					<p>
-        Hier findest du alle allgemeinen Workshop-Materialien und Vorlagen, wie z. B. die Datenschutzerklärung oder Informationsblätter. 
-				Persönliche Daten oder individuelle Ausfüllungen sind darin nicht enthalten.
-      </p>
-      <div v-for="image in resWorkshop.data.workshop_serie.material" :key="image.id">
-        <div v-if="image.mime === 'application/pdf'">
-          <UButton
-            icon="i-lucide-download"
-            :label="image.name"
-            color="neutral"
-            variant="ghost"
-            :href="getImageUrl(image)"
-            target="_blank"
-            download
-          />
+    <UAccordion
+      type="multiple"
+      :items="items"
+      :ui="{
+        item: 'border-b-0',
+        label: 'text-base font-normal',
+        trigger: 'py-1 gap-3',
+        leadingIcon: 'shrink-0 size-6 text-lg'
+      }"
+    >
+      <template #body="{ item }">
+        <div v-if="item.label === 'Beschreibung'">
+          {{ resWorkshop.data.workshop_serie.description }}
         </div>
         <div v-else>
-          <img
-            :src="getImageUrl(image)"
-            :alt="image.name"
-            class="rounded"
-          />
+          <p>
+            Hier findest du alle allgemeinen Workshop-Materialien und Vorlagen,
+            wie z. B. die Datenschutzerklärung oder Informationsblätter.
+            Persönliche Daten oder individuelle Ausfüllungen sind darin nicht
+            enthalten.
+          </p>
+          <div
+            v-for="image in resWorkshop.data.workshop_serie.material"
+            :key="image.id"
+          >
+            <div v-if="image.mime === 'application/pdf'">
+              <UButton
+                icon="i-lucide-download"
+                :label="image.name"
+                color="neutral"
+                variant="ghost"
+                :href="getImageUrl(image)"
+                target="_blank"
+                download
+              />
+            </div>
+            <div v-else>
+              <img
+                :src="getImageUrl(image)"
+                :alt="image.name"
+                class="rounded"
+              />
+            </div>
+          </div>
         </div>
-      </div>
-				</div>
+      </template>
+    </UAccordion>
+  </Section>
+  <div v-if="orderedSteps?.length" class="mb-4 mx-2">
+    <CustomStepper :steps="orderedSteps" :completed-step="completedStep" />
+  </div>
+  <Section>
+    <h1 class="text-center">Team hinter dem Workshop</h1>
 
-  </template>
-		</UAccordion>
-			</Section>
-    <div v-if="orderedSteps?.length" class="mb-4 mx-2">
-      <CustomStepper :steps="orderedSteps" :completed-step="completedStep" />
+    <UCarousel loop arrows  auto-height :items="resTeamMembers.data" v-slot="{ item }">
+<UCard class="bg-primary-100 light text-default my-4">
+  <div class="flex flex-col items-center text-center">
+    <UAvatar
+      :src="getImageUrl(item?.team_member?.profilepicture?.url)"
+      :alt="item.team_member.username"
+      :ui="{ root: 'size-24 text-3xl' }"
+    />
+
+    <h2  class="mt-4">{{ item.team_member.username }}</h2>
+    <p class="text-sm text-gray-500">{{ item.workshopRole }}</p>
+    <div v-if="item.team_member.email" class="text-sm">
+			<div class="flex items-center space-x-1 py-1">
+		<AtSign :size="14" stroke-width="1.5" />
+      <a :href="`mailto:${item.team_member.email}`" class="underline">
+        {{ item.team_member.email }}
+      </a>
+		</div>
     </div>
+    <div v-if="item.team_member.phone" class="text-sm">
+			<div class="flex items-center space-x-1 py-1">
+		<Phone :size="14" stroke-width="1.5" />
+      <a :href="`tel:${item.team_member.phone}`" class="underline">
+        {{ item.team_member.phone }}
+      </a>
+		</div>
+    </div>
+  </div>
 
+  <p class="py-4 px-2 text-center">„{{ item.description }}“</p>
+</UCard>
+    </UCarousel>
+  </Section>
   <Section bg-color="bg-primary-100" class="light text-default">
-    <h1 class="pb-4">Wir freuen uns über einen weiteren Austausch</h1>
+    <h1 class="text-center pb-4">
+      Wir freuen uns über einen weiteren Austausch
+    </h1>
     <UForm :state="state" class="pb-4" @submit="onSubmit">
       <UFormField name="anonym">
         <template v-if="isWorkshop">
@@ -112,7 +162,7 @@
 </template>
 
 <script setup lang="ts">
-import { Calendar, MapPin, HandCoins } from 'lucide-vue-next'
+import { Calendar, MapPin, HandCoins, Phone, AtSign } from 'lucide-vue-next'
 import type { Workshop } from '../../types/Workshop'
 import type { WorkshopResult } from '~/types/WorkshopResult'
 import type { Message } from '~/types/Message'
@@ -142,7 +192,7 @@ const state = reactive({
 
 onMounted(async () => {
   loadMessages()
-	loadEvaluationSteps()
+  loadEvaluationSteps()
   if (!isWorkshop.value) {
     route.meta.header = {
       title: 'Co-Design Workshop',
@@ -150,13 +200,12 @@ onMounted(async () => {
       showHeader: true
     }
   }
-	if ('serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', async (event) => {
-			loadEvaluationSteps()
+      loadEvaluationSteps()
     })
   }
 })
-
 const resWorkshop = await findOne<Workshop>('workshops', workshopID, {
   populate: { workshop_serie: { populate: '*' } }
 })
@@ -165,7 +214,7 @@ const items = ref<AccordionItem[]>([
     label: 'Beschreibung',
     icon: 'i-lucide-scroll-text'
   },
-	{
+  {
     label: 'Materialien',
     icon: 'i-lucide-folder-open'
   }
@@ -196,6 +245,19 @@ const resWorkshopResults = await find<WorkshopResult>('workshop-results', {
   }
 })
 
+const resTeamMembers = await find('teams', {
+  filters: {
+    workshop_serie: resWorkshop.data.workshop_serie.id // filtert Teams zur Workshop-Serie
+  },
+  populate: {
+    team_member: {
+      populate: { profilepicture: true }
+    }
+  },
+	sort: ['workshopRole:desc']
+})
+console.log(resTeamMembers)
+
 const userGroupId = ref<string>()
 const filteredResults = ref<any[]>([])
 const stepsWithStatus = ref<any[]>([])
@@ -216,10 +278,13 @@ const completedStep = computed(() =>
 )
 
 async function loadEvaluationSteps() {
-	if (!resWorkshop.data.workshop_serie?.evaluation_steps) {
-  console.warn('Keine evaluation_steps im Workshop vorhanden:', resWorkshop.data)
-}
-console.log('hier')
+  if (!resWorkshop.data.workshop_serie?.evaluation_steps) {
+    console.warn(
+      'Keine evaluation_steps im Workshop vorhanden:',
+      resWorkshop.data
+    )
+  }
+  console.log('hier')
   const userParticipationRes = await find('participations', {
     filters: {
       user: { id: { $eq: user.value.id } }
@@ -255,22 +320,23 @@ console.log('hier')
       }
     })
     .filter(
-      (result) => result.Result.length > 0 || result.evaluationStatus !== 'to do'
+      (result) =>
+        result.Result.length > 0 || result.evaluationStatus !== 'to do'
     )
 
   filteredResults.value = filtered
 
-  stepsWithStatus.value = resWorkshop.data.workshop_serie.evaluation_steps.map((step: any) => {
-    const result = filtered.find(
-      (r: any) => r.evaluation_step.id === step.id
-    )
-    return {
-      ...step,
-      evaluationStatus: result?.evaluationStatus ?? 'todo',
-      estimatedCompletion: result?.estimatedCompletion,
-      result: result?.Result
+  stepsWithStatus.value = resWorkshop.data.workshop_serie.evaluation_steps.map(
+    (step: any) => {
+      const result = filtered.find((r: any) => r.evaluation_step.id === step.id)
+      return {
+        ...step,
+        evaluationStatus: result?.evaluationStatus ?? 'todo',
+        estimatedCompletion: result?.estimatedCompletion,
+        result: result?.Result
+      }
     }
-  })
+  )
 }
 
 async function loadMessages() {
@@ -295,17 +361,16 @@ async function loadMessages() {
 
 async function onSubmit(event: FormSubmitEvent<typeof state>) {
   try {
-    
-		if (!state.message || state.message.trim() === '') {
-			return 
-		}
+    if (!state.message || state.message.trim() === '') {
+      return
+    }
     const message: any = {
       message: state.message,
       workshop: resWorkshop.data.documentId
     }
     if (!isWorkshop.value && !state.anonym) {
-			//console.log(user.value)
-      message.author =user.value.id
+      //console.log(user.value)
+      message.author = user.value.id
     }
     await create('messages', message)
     state.anonym = false
