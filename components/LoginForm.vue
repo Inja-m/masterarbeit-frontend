@@ -10,7 +10,7 @@
 			</div>
 			<!-- Profilname oder Identifier -->
 			<UFormField :label="computedIdentifierLabel" name="identifier">
-				<UInput v-model="state.identifier" :placeholder="computedIdentifierLabel" icon="i-lucide-circle-user" required
+				<UInput v-model="state.identifier" :placeholder="computedIdentifierLabel" icon="i-lucide-user" required
 					class="w-full" />
 			</UFormField>
 
@@ -21,7 +21,7 @@
 
 			<!-- Passwort -->
 			<UFormField label="Passwort" name="password">
-				<UInput v-model="state.password" :type="show ? 'text' : 'password'" placeholder="Passwort"
+				<UInput v-model="state.password" :type="show ? 'text' : 'password'" placeholder="Passwort" icon="i-lucide-lock"
 					:ui="{ trailing: 'pe-1' }" class="w-full">
 					<template #trailing>
 						<UButton color="neutral" variant="link" :icon="show ? 'i-lucide-eye-off' : 'i-lucide-eye'"
