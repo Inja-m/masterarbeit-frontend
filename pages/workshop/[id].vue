@@ -22,7 +22,7 @@
     </h1>
 
     <IconText :icon="Calendar" :text="formatDate(resWorkshop.data.date)" />
-    <IconText :icon="MapPin" :text="resWorkshop.data.location" />
+    <IconText :icon="MapPin" :text="resWorkshop.data.location.name" link  @click="open"/>
     <div v-if="resWorkshop.data.reward">
       <IconText :icon="HandCoins" :text="resWorkshop.data.reward" />
     </div>
@@ -167,7 +167,20 @@ import type { Workshop } from '../../types/Workshop'
 import type { WorkshopResult } from '~/types/WorkshopResult'
 import type { Message } from '~/types/Message'
 import { useImageUrl } from '@/composables/useImageUrl'
+import { LocationModal } from '#components'
 const { getImageUrl } = useImageUrl()
+
+const overlay = useOverlay()
+const modal = overlay.create(LocationModal)
+
+async function open() {
+  const instance = modal.open({location: resWorkshop.data.location})
+  const everythingRight = await instance.result
+
+  if (everythingRight) {
+    return
+  }
+}
 
 definePageMeta({
   name: 'workshop-details',
@@ -207,7 +220,10 @@ onMounted(async () => {
   }
 })
 const resWorkshop = await findOne<Workshop>('workshops', workshopID, {
-  populate: { workshop_serie: { populate: '*' } }
+  populate: { 
+		workshop_serie: { populate: '*' },
+		location: { populate: '*' },
+ }
 })
 const items = ref<AccordionItem[]>([
   {

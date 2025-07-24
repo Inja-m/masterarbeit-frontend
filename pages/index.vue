@@ -15,7 +15,7 @@
           workshop.workshop_serie.project.name
         }}</UBadge>
         <IconText :icon="Calendar" :text="formatDate(workshop.date)" />
-        <IconText :icon="MapPin" :text="workshop.location" />
+        <IconText :icon="MapPin" :text="workshop.location.name" />
         <div v-if="workshop.reward">
           <IconText :icon="HandCoins" :text="workshop.reward" />
         </div>
@@ -82,7 +82,8 @@ const fetchUserWorkshops = async () => {
               populate: {
                 workshop_serie: {
                   populate: ['project'] 
-                }
+                },
+								location: { populate: '*' },
               }
             }
           }
