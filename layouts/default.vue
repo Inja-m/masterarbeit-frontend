@@ -31,7 +31,7 @@ const route = useRoute()
 const router = useRouter()
 
 function isPathNavigation () {
-if(route.path === '/login'||route.path === '/impressum' ||route.path === '/datenschutz') return false
+if(route.path === '/login'||route.path === '/passwordreset'|| route.path === '/impressum' ||route.path === '/datenschutz') return false
 return true
 }
 

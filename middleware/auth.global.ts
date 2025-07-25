@@ -25,7 +25,7 @@ const { find } = useStrapi()
 				console.error('Login Workshop', e)
 			}
 	}
-  if (to.path === '/login') {
+  if (to.path === '/login' ||to.path === '/passwordreset' ) {
 		if(user.value) await logout()
 		return
 	}else if(to.path === '/datenschutz' || to.path === '/impressum' )	return
