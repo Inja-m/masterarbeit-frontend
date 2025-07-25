@@ -6,7 +6,9 @@
   >
     <template #title>Beispiel für die Erstellung des Codewortes</template>
     <template #description>
-      <div v-if="personalCodeExample" v-html="marked(personalCodeExample)" />
+			Bitte beachte: <strong>Groß- und Kleinschreibung</strong> im Codewort müssen später eingehalten werden.
+    	Idealerweise schreibst du es genauso wie im Beispiel. 
+      <div v-if="personalCodeExample" v-html="marked(personalCodeExample)" class="pt-4" />
     </template>
   </UAlert>
 </template>
