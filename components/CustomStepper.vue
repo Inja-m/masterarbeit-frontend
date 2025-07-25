@@ -178,11 +178,11 @@ function setActive(index: number) {
 function getStepColorClass(status: string) {
   switch (status) {
     case 'done':
-      return 'border bg-green-300 dark:text-inverted'
+      return 'border bg-done dark:text-inverted'
     case 'inProgress':
-      return 'border bg-blue-300 dark:text-inverted'
+      return 'border bg-inProgress dark:text-inverted'
     default:
-      return 'border bg-yellow-100 dark:text-inverted'
+      return 'border bg-todo dark:text-inverted'
   }
 }
 function getStatusLabel(status: string) {
@@ -209,7 +209,13 @@ watch(
               }
             }
           },
-          populate: '*'
+          populate: {
+						workshop: true,
+						result: {
+    populate: '*'
+  }
+					}
+					 
         })
       }
     }

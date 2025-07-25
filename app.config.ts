@@ -1,5 +1,10 @@
 export default defineAppConfig({
   ui: {	
+		colors: {
+      done: 'done',
+      inprogress: 'inprogress',
+      todo: 'todo',
+    },
 		button:{
 			defaultVariants: {
         size: 'lg'

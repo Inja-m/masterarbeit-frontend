@@ -80,7 +80,7 @@
   <Section>
     <h1 class="text-center">Team hinter dem Workshop</h1>
 
-    <UCarousel loop arrows  auto-height :items="resTeamMembers.data" v-slot="{ item }">
+    <UCarousel loop arrows auto-height :items="resTeamMembers.data" v-slot="{ item }">
 <UCard class="bg-primary-100 light text-default my-4">
   <div class="flex flex-col items-center text-center">
     <UAvatar
