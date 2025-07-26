@@ -14,5 +14,8 @@ h2{
 	@apply font-medium;
 }
 ul{
-	@apply list-disc list-inside;
+	@apply list-disc list-inside space-y-1;
+}
+ol{
+	@apply list-decimal list-inside space-y-1;
 }

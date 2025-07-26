@@ -2,7 +2,7 @@
   <div v-if="hasAnyPicture">
     <h2>Die folgenden Materialien von dir wurden digitalisiert:</h2>
     <div v-for="res in result" :key="res.id">
-      <ul class="list-disc list-inside my-4">
+      <ul class="my-4">
         <li v-for="pictureGroup in res.Pictures" :key="pictureGroup.id">
           {{ pictureGroup.title }}
         </li>

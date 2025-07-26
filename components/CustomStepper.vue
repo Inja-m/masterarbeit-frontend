@@ -62,7 +62,7 @@
       />
 
       <div v-if="steps[activeStep]?.evaluationStatus === 'done'" class="mt-4">
-        <div v-if="!isWorkshop">
+        <div v-if="!isWorkshop" class="space-y-4">
           <Digitisation
             v-if="steps[activeStep]?.identifier === 'digitalisation'"
             :result="steps[activeStep]?.result"
@@ -76,18 +76,14 @@
             :result="userStories.data"
           />
 
-          <template v-else-if="steps[activeStep]?.identifier === 'publication'">
-            <h2>Veröffentlichte Materialien</h2>
-            <EvaluationStep :result="steps[activeStep]?.result" />
-          </template>
-
           <template v-else>
             <TextBlock :result="steps[activeStep]?.result" />
+						<h2 v-if="steps[activeStep]?.identifier === 'publication'">Veröffentlichte Materialien</h2>
             <EvaluationStep :result="steps[activeStep]?.result" />
           </template>
           <TextBlock
             v-if="
-              ['digitalisation', 'qualitative', 'publication'].includes(
+              ['digitalisation', 'qualitative'].includes(
                 steps[activeStep]?.identifier
               ) === true
             "

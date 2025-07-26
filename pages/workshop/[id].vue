@@ -255,6 +255,19 @@ const resWorkshopResults = await find<WorkshopResult>('workshop-results', {
             workshop_group: true,
             Text: true
           }
+        },
+        'media.research': {
+          populate: {
+            researchQuestion: {
+              populate: '*'
+            },
+            researchDesign: {
+              populate: '*'
+            },
+						context: {
+              populate: '*'
+            },
+          }
         }
       }
     }
@@ -272,7 +285,7 @@ const resTeamMembers = await find('teams', {
   },
 	sort: ['workshopRole:desc']
 })
-console.log(resTeamMembers)
+
 
 const userGroupId = ref<string>()
 const filteredResults = ref<any[]>([])
@@ -323,12 +336,14 @@ async function loadEvaluationSteps() {
   const filtered = resWorkshopResults.data
     .map((result) => {
       const filteredComponents = result.Result.filter((component) => {
-        return (
-          component.__component === 'media.totality' &&
-          (!component.workshop_group ||
-            component.workshop_group.documentId === userGroupId.value)
-        )
-      })
+  const isTotality =
+    component.__component === 'media.totality' &&
+    (!component.workshop_group ||
+      component.workshop_group.documentId === userGroupId.value)
+
+  const isResearch = component.__component === 'media.research' 
+  return isTotality || isResearch
+})
 
       return {
         ...result,
