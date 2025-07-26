@@ -3,7 +3,7 @@
 
 @theme default {
   --color-done: var(--color-success-300);
-	--color-inprogress: var(--color-info-300) ;
+	--color-inProgress: var(--color-info-300) ;
 	--color-todo: var(--color-warning-100);
 }
 

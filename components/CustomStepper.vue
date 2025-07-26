@@ -61,7 +61,7 @@
         class="prose max-w-none"
       />
 
-      <div v-if="steps[activeStep]?.evaluationStatus === 'done'" class="mt-4">
+      <div v-if="steps[activeStep]?.evaluationStatus !== 'todo'" class="mt-4">
         <div v-if="!isWorkshop" class="space-y-4">
           <Digitisation
             v-if="steps[activeStep]?.identifier === 'digitalisation'"
@@ -149,17 +149,12 @@ const props = defineProps<{
 
 function findActiveStep(steps) {
   // 1. Schritt mit 'inProgress'
-  const inProgressIndex = steps.findIndex(s => s.evaluationStatus === 'inProgress')
-  if (inProgressIndex !== -1) return inProgressIndex
+  const inProgressIndex = steps.findIndex(s => s.evaluationStatus === 'todo')
+	console.log(inProgressIndex , steps.length)
 
-  // 2. letzter Schritt mit 'done'
-  const doneIndices = steps
-    .map((s, i) => s.evaluationStatus === 'done' ? i : -1)
-    .filter(i => i !== -1)
-  if (doneIndices.length > 0) return Math.max(...doneIndices)
-
-  // 3. fallback erster Schritt
-  return 0
+	if (inProgressIndex === 0) return inProgressIndex
+  if (inProgressIndex !== -1) return inProgressIndex - 1
+  return steps.length - 1
 }
 function getIconComponent(component: string) {
   return (
