@@ -37,10 +37,11 @@
 <script setup lang="ts">
 import { SquareArrowOutUpRight } from 'lucide-vue-next'
 import { marked } from 'marked'
+import type { Location } from '../types/Location'
 const { getImageUrl } = useImageUrl()
 
 const props = defineProps<{
-  location: Array
+  location: Location
 }>()
 
 const emit = defineEmits(['update:open'])

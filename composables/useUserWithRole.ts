@@ -1,7 +1,8 @@
+import type { User } from '../types/User'
 export const useUserWithRole = async () => {
   const { findOne } = useStrapi()
   const userWithoutRole = useStrapiUser()
-	const user = ref(null)
+	const user = ref(null) as Ref<User | null>
 	const { fetchUser } = useStrapiAuth()
 	//const fetchedUser = await fetchUser()
 	//console.log(fetchedUser)

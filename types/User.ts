@@ -1,3 +1,5 @@
+import type { Media } from "./Media"
+
 export interface User {
   id: number
   username: string
@@ -11,4 +13,6 @@ export interface User {
     description?: string
     type: string
   }
+	profilepicture: Media
+	phone: string
 }

@@ -31,6 +31,7 @@
 import { Calendar, MapPin, HandCoins } from 'lucide-vue-next'
 import type { Participation } from '~/types/Participation'
 import type { Workshop } from '~/types/Workshop'
+import type { User } from '../types/User'
 import { JoinGroupModal } from '#components'
 
 useHead({
@@ -65,7 +66,7 @@ const userWorkshops = ref<Workshop[]>([])
 
 const fetchUserWorkshops = async () => {
   try {
-    const user = await fetchUser()
+    const user = await fetchUser() as Ref<User | null>
 		
     const response = await find<Participation>('participations', {
       filters: {

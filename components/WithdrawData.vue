@@ -94,10 +94,11 @@
 <script setup lang="ts">
 import type { FormError, FormErrorEvent, FormSubmitEvent } from '@nuxt/ui'
 import type { Workshop } from '../types/Workshop'
+import type { PersonalCode } from '../types/PersonalCode'
 import BaseModalAction from './BaseModalAction.vue'
 
 const props = defineProps<{
-  open: boolean
+  open?: boolean
   workshopId: string
 }>()
 
@@ -131,7 +132,7 @@ watch(
 watch(modalOpen, (val) => emit('update:open', val))
 watch(showModal, (val) => (modalOpen.value = val))
 
-const validate = async (state: any): Promise<FormError[]> => {
+const validate = async (state: { code?: string }): Promise<FormError[]> => {
   const errorList = []
   if (!state.code) {
     errorList.push({ name: 'identifier', message: 'Erforderlich' })
@@ -160,17 +161,13 @@ async function onError(event: FormErrorEvent) {
 }
 
 async function validateCode(code: string) {
-  const res = await find('personal-codes', {
+  const res = await find<PersonalCode>('personal-codes', {
     filters: {
       code: { $eq: code }
     }
   })
   codeId.value = res.data[0]?.documentId
   return res.data.length > 0
-}
-
-function confirmWithdraw() {
-  showModal.value = true
 }
 
 async function withdraw() {

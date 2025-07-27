@@ -108,10 +108,11 @@
 <script setup lang="ts">
 import { marked } from 'marked'
 import { useImageUrl } from '@/composables/useImageUrl'
+import type { WorkshopResultBlock } from '~/types/Components'
 const { getImageUrl } = useImageUrl()
 
 defineProps<{
-  result: Array
+  result: WorkshopResultBlock[]
 }>()
 
 function getColor(status: string) {

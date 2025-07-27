@@ -28,17 +28,19 @@
 
 <script setup lang="ts">
 import { Bell, BellOff, BellRing } from 'lucide-vue-next'
+import type { Participation } from '../types/Participation'
+import type { User } from '../types/User'
 
 const props = defineProps<{
   title: string
-  workshopId: string
+  workshopId?: number
 }>()
 
 const { find, update } = useStrapi()
-const user = await useUserWithRole()
+const user = await useUserWithRole()  as Ref<User | null>
 
 const value = ref<'all' | 'relevant' | 'off'>()
-const participationId = ref<number | null>(null)
+const participationId = ref<string | null>(null)
 
 const isInitialized = ref(false)
 const isDrawerOpen = ref(false)
@@ -82,8 +84,8 @@ const registerSubscription = async () => {
 async function loadParticipation() {
 	const res = await find<Participation>('participations', {
     filters: {
-      user: { id: { $eq: user.value?.id } },
-      workshop_group: { workshops: { id: { $eq: props.workshopId } } }
+      user: { id: { $eq: user.value.id } },
+      workshop_group: { workshop: { id: { $eq: props.workshopId } } }
     }
   })
   if (res.data.length > 0) {

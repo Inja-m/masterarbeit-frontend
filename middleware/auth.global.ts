@@ -1,8 +1,9 @@
+import type { User } from '../types/User'
 export default defineNuxtRouteMiddleware(async (to) => {
   // Seite /login überspringen    
 const { logout, fetchUser } = useStrapiAuth()
 const { find } = useStrapi()
-  const user = await  useUserWithRole()
+  const user = await  useUserWithRole() as Ref<User | null>
 
   if (!user.value) {
     try {
@@ -19,7 +20,7 @@ const { find } = useStrapi()
 					populate: { workshop_group: { populate: ['workshop'] } }
 				})
 				return navigateTo(
-					`/workshop/${data[0].workshop_group?.workshop?.documentId}`
+					`/workshop/${data[0]?.workshop_group?.workshop?.documentId}`
 				)
 			} catch (e) {
 				console.error('Login Workshop', e)

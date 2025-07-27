@@ -24,10 +24,10 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  title: string
-  label: string
+  title?: string
+  label?: string
   icon?: string
-  open: boolean
+  open?: boolean
 }>()
 
 const slots = useSlots()

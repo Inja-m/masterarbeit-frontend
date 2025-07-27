@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { useStrapi } from '#imports'
 import type { UserNotification } from '~/types/UserNotification'
+import type { User } from '../types/User'
 
 const notifications = ref<UserNotification[]>([])
 
@@ -8,7 +9,7 @@ export function useNotifications() {
 	onMounted(() => {
   fetchNotifications()
 	if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.addEventListener('message', (event) => {
+    navigator.serviceWorker.addEventListener('message', () => {
 			fetchNotifications()
     })
   }
@@ -17,7 +18,7 @@ export function useNotifications() {
 	const { fetchUser } = useStrapiAuth()
 
   const fetchNotifications = async () => {
-		const user = await useStrapiUser()
+		const user = await useStrapiUser() as Ref<User>
 		  if (!user.value) {
     try {
       await fetchUser()

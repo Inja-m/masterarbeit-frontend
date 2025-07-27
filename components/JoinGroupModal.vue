@@ -36,7 +36,7 @@ const state = reactive({
 })
 
 
-const validate = async (state: any): Promise<FormError[]> => {
+const validate = async (state:{identifier:string}): Promise<FormError[]> => {
   const errors = []	
 		const exists = await doesIdentifierExist(state.identifier)
 		if (!state.identifier) {

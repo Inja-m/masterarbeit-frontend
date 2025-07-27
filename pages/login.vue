@@ -27,13 +27,13 @@ const items = [
     label: 'Workshop ansehen',
     icon: 'i-lucide-laptop',
 		description: 'Zugang über Workshop-Identifier',
-    slot: 'workshop' as const
+    slot: 'workshop'
   },
 	{
     label: 'Login',
     icon: 'i-lucide-log-in',
 		description: 'Melde dich in deinem Konto an',
-    slot: 'login' as const
+    slot: 'login'
   }
-] satisfies TabsItem[]
+]
 </script>

@@ -63,7 +63,7 @@
 
       <div v-if="steps[activeStep]?.evaluationStatus !== 'todo'" class="mt-4">
         <div v-if="!isWorkshop" class="space-y-4">
-          <Digitisation
+          <Digitalisation
             v-if="steps[activeStep]?.identifier === 'digitalisation'"
             :result="steps[activeStep]?.result"
           />
@@ -128,12 +128,13 @@
 
 <script setup lang="ts">
 import * as LucideIcons from 'lucide-vue-next'
-import Digitisation from './evaluationStepResults/Digitisation.vue'
+import Digitalisation from './evaluationStepResults/Digitalisation.vue'
 import TextBlock from './evaluationStepResults/TextBlock.vue'
 import Qualitative from './evaluationStepResults/Qualitative.vue'
 import { marked } from 'marked'
 import { getISOWeek } from '@/utils/formatRelativeTime'
 import EvaluationStep from './evaluationStepResults/EvaluationStep.vue'
+import type { UserStory } from '../types/UserStory'
 
 const { find } = useStrapi()
 const route = useRoute()
@@ -141,7 +142,7 @@ const workshopID = route.params.id as string
 const user = await useUserWithRole()
 const isWorkshop = computed(() => user.value?.role?.name === 'Workshop')
 const userStories = ref(null)
-const activeStep = ref(0)
+const activeStep = ref<number>(0)
 
 const props = defineProps<{
   steps: { name: string; description: string; icon: string }[]
@@ -192,7 +193,7 @@ watch(
     if (newId && newId !== oldId) {
 			activeStep.value = findActiveStep(props.steps)
       if (!isWorkshop.value) {
-        userStories.value = await find('user-stories', {
+        userStories.value = await find<UserStory>('user-stories', {
           filters: {
             workshop: {
               documentId: {

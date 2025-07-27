@@ -9,7 +9,7 @@ Inja Mainhardt<br>
 </p><p><strong>Kontakt:</strong> <br>
 Telefon: 01748287184<br>
 E-Mail: <a href='mailto:cotrack@mainhardts.de'>cotrack@mainhardts.de</a>
-</br></p>
+<br></p>
 <p class="text-xs text-gray-400"> Impressum von <a href="https://impressum-generator.de" rel="dofollow">Impressum-Generator.de</a>. Powered by <a href="https://www.kanzlei-hasselbach.de/" rel="nofollow">Franziska Hasselbach, Bonn</a>.</p>
 
 </Section>

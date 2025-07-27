@@ -164,10 +164,17 @@
 <script setup lang="ts">
 import { Calendar, MapPin, HandCoins, Phone, AtSign } from 'lucide-vue-next'
 import type { Workshop } from '../../types/Workshop'
-import type { WorkshopResult } from '~/types/WorkshopResult'
+import type { User } from '../../types/User'
+import type { Team } from '../../types/Team'
 import type { Message } from '~/types/Message'
 import { useImageUrl } from '@/composables/useImageUrl'
 import { LocationModal } from '#components'
+import type { FormSubmitEvent } from '@nuxt/ui'
+import type { Participation } from '~/types/Participation'
+import type { WorkshopResult, StepResult} from '~/types/WorkshopResult'
+import type { EvaluationStep } from '~/types/EvaluationStep'
+export type EvaluationStepWithStatus = EvaluationStep & StepResult
+
 const { getImageUrl } = useImageUrl()
 
 const overlay = useOverlay()
@@ -195,7 +202,7 @@ const { findOne, find, create } = useStrapi()
 const route = useRoute()
 const workshopID = route.params.id as string
 const messages = ref<Message[]>([])
-const user = await useUserWithRole()
+const user = await useUserWithRole() as Ref<User | null>
 const isWorkshop = computed(() => user.value?.role?.name === 'Workshop')
 
 const state = reactive({
@@ -214,7 +221,7 @@ onMounted(async () => {
     }
   }
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.addEventListener('message', async (event) => {
+    navigator.serviceWorker.addEventListener('message', async () => {
       loadEvaluationSteps()
     })
   }
@@ -225,7 +232,8 @@ const resWorkshop = await findOne<Workshop>('workshops', workshopID, {
 		location: { populate: '*' },
  }
 })
-const items = ref<AccordionItem[]>([
+
+const items = ref([
   {
     label: 'Beschreibung',
     icon: 'i-lucide-scroll-text'
@@ -274,13 +282,21 @@ const resWorkshopResults = await find<WorkshopResult>('workshop-results', {
   }
 })
 
-const resTeamMembers = await find('teams', {
+const resTeamMembers = await find<Team>('teams', {
   filters: {
-    workshop_serie: resWorkshop.data.workshop_serie.id // filtert Teams zur Workshop-Serie
+    workshop_serie: {
+      id: {
+        $eq: resWorkshop.data.workshop_serie.id
+      }
+    }
   },
   populate: {
     team_member: {
-      populate: { profilepicture: true }
+      populate: { 
+				profilepicture: {
+					populate :'*'
+				}
+			}
     }
   },
 	sort: ['workshopRole:desc']
@@ -288,8 +304,9 @@ const resTeamMembers = await find('teams', {
 
 
 const userGroupId = ref<string>()
-const filteredResults = ref<any[]>([])
-const stepsWithStatus = ref<any[]>([])
+const filteredResults = ref<WorkshopResult[]>([])
+const stepsWithStatus = ref<( EvaluationStepWithStatus )[]>([])
+
 
 const orderedSteps = computed(() => {
   const order = { done: 0, inProgress: 1, todo: 2 }
@@ -302,7 +319,7 @@ const orderedSteps = computed(() => {
 
 const completedStep = computed(() =>
   orderedSteps.value.findLastIndex(
-    (step: any) => step.evaluationStatus === 'done'
+    (step: EvaluationStepWithStatus) => step.evaluationStatus === 'done'
   )
 )
 
@@ -314,7 +331,7 @@ async function loadEvaluationSteps() {
     )
   }
   console.log('hier')
-  const userParticipationRes = await find('participations', {
+  const userParticipationRes = await find<Participation>('participations', {
     filters: {
       user: { id: { $eq: user.value.id } }
     },
@@ -352,14 +369,14 @@ async function loadEvaluationSteps() {
     })
     .filter(
       (result) =>
-        result.Result.length > 0 || result.evaluationStatus !== 'to do'
+        result.Result.length > 0 || result.evaluationStatus !== 'todo'
     )
 
   filteredResults.value = filtered
-
+		console.log(filteredResults)
   stepsWithStatus.value = resWorkshop.data.workshop_serie.evaluation_steps.map(
-    (step: any) => {
-      const result = filtered.find((r: any) => r.evaluation_step.id === step.id)
+    (step: EvaluationStepWithStatus) => {
+      const result = filtered.find((r: aEvaluationStepWithStatus) => r.evaluation_step.id === step.id)
       return {
         ...step,
         evaluationStatus: result?.evaluationStatus ?? 'todo',
@@ -368,6 +385,7 @@ async function loadEvaluationSteps() {
       }
     }
   )
+	console.log(stepsWithStatus)
 }
 
 async function loadMessages() {
@@ -395,7 +413,7 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
     if (!state.message || state.message.trim() === '') {
       return
     }
-    const message: any = {
+    const message: Message = {
       message: state.message,
       workshop: resWorkshop.data.documentId
     }
@@ -403,7 +421,7 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
       //console.log(user.value)
       message.author = user.value.id
     }
-    await create('messages', message)
+    await create<Message>('messages', message)
     state.anonym = false
     state.message = undefined
     await loadMessages()

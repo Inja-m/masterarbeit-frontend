@@ -25,6 +25,7 @@
 </template>
 
 <script setup lang="ts">
+import type { User } from '../types/User'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -41,7 +42,7 @@ return false
 }
 
 
-const user = await useUserWithRole()
+const user = await useUserWithRole() as Ref<User | null>
 const { find } = useStrapi()
 
 const isWorkshopRole = computed(() => {

@@ -61,7 +61,9 @@
 </template>
 
 <script setup lang="ts">
+import type { User } from '../types/User'
 import * as v from 'valibot'
+import type { FormError } from '@nuxt/ui'
 import { until } from '@vueuse/core'
 
 const { resetPassword } = useStrapiAuth()
@@ -71,7 +73,7 @@ const code = ref('')
 const show = ref(false)
 const loginError = ref<string | null>(null)
 
-const user = await useUserWithRole()
+const user = await useUserWithRole() as Ref<User | null>
 
 const schema = computed(() => {
     return v.object({
@@ -79,7 +81,7 @@ const schema = computed(() => {
       confirmPassword: v.pipe(v.string(), v.minLength(6, 'Min. 6 Zeichen'))
     })
 })
-const validate = (state: any): FormError[] => {
+const validate = (state: {confirmPassword:string,password:string}): FormError[] => {
   const errors = []
   if (state.password !== state.confirmPassword) {
     errors.push({ name: 'confirmPassword', message: 'Nicht identisch' })

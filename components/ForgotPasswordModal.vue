@@ -29,6 +29,8 @@
 
 <script setup lang="ts">
 import * as v from 'valibot'
+import type { FormError } from '@nuxt/ui'
+
 const { forgotPassword } = useStrapiAuth()
 
 const props = defineProps<{ open?: boolean }>()
@@ -43,6 +45,13 @@ const schema = computed(() => {
 		})
 })
 
+const validate = async (state:Partial<{ email: string }>): Promise<FormError[]> => {
+  const errors = []	
+		if (!state.email) {
+			errors.push({ name: 'identifier', message: 'Erforderlich' })
+		}
+  return errors
+}
 
 // Form-Zustand
 const state = reactive({

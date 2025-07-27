@@ -63,7 +63,7 @@ const isFormValid = computed(() => {
   return !!state.personalCode && !!state.groupId
 })
 
-const validate = async (state: any): Promise<FormError[]> => {
+const validate = async (state:{groupId: string, personalCode: string}): Promise<FormError[]> => {
   const errors = []
   if (!state.groupId) errors.push({ name: 'groupId', message: 'Erforderlich' })
 	if (props.required && !state.personalCode) errors.push({ name: 'personalCode', message: 'Erforderlich' })

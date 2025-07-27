@@ -1,12 +1,11 @@
-import type { Notification } from "./Notification"
 import type { User } from "./User"
-
-export interface UserNotification {
+export interface Subscription {
 	id: number
 	documentId: string
-	read: boolean
-	notification: Notification
+	endpoint: string
+	expirationTime: string
 	user: User
+	keys?: Record<string, unknown> | null 
 	createdAt: string
 	updatedAt: string
 	publishedAt: string

@@ -104,6 +104,8 @@
 import * as v from 'valibot'
 import { until } from '@vueuse/core'
 import { JoinGroupModal, ForgotPasswordModal } from '#components'
+import type { User } from '../types/User'
+import type { FormError } from '@nuxt/ui'
 
 const props = defineProps<{
   title?: string
@@ -111,7 +113,7 @@ const props = defineProps<{
   isRegister?: boolean
 }>()
 
-const { login, register, fetchUser } = useStrapiAuth()
+const { login, register } = useStrapiAuth()
 const { find } = useStrapi()
 const route = useRoute()
 
@@ -119,7 +121,7 @@ const show = ref(false)
 const isRegister = ref(props.isRegister ?? false)
 const loginError = ref<string | null>(null)
 
-const user = await useUserWithRole()
+const user = await useUserWithRole() as Ref<User | null>
 
 const emit = defineEmits<{ close: [boolean] }>()
 const overlay = useOverlay()
@@ -161,7 +163,7 @@ const schema = computed(() => {
     })
   }
 })
-const validate = (state: any): FormError[] => {
+const validate = (state:{identifer?:string, email?: string, password?:string, confirmPassword?:string} ): FormError[] => {
   const errors = []
   if (isRegister.value && state.password !== state.confirmPassword) {
     errors.push({ name: 'confirmPassword', message: 'Nicht identisch' })

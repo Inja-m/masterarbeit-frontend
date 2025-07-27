@@ -22,8 +22,8 @@
 defineProps<{
   icon: Component
   text: string
-	link: boolean
-	to: string
+	link?: boolean
+	to?: string
 }>()
 
 </script>
