@@ -7,7 +7,6 @@
     Das bedeutet: Auch wenn eine User Story bereits im Rahmen der Auswertung dokumentiert wurde, 
 		kann ihr Status später, basierend auf dem Entwicklungsfortschritt, angepasst werden.
 	</p>
-	
   <UCarousel
     v-slot="{ item }"
     :items="result"
@@ -26,7 +25,7 @@
         Als <strong>{{ item.role }}</strong> möchte ich <em>{{ item.goal }}</em
         >, damit {{ item.benefit }}.
       </template>
-      <template v-if="item.developmentStatus !== 'todo'" #default>
+      <template v-if="item.developmentStatus !== 'todo' && item.result" #default>
         <div v-if="item.result.title">
           <h1>{{ item.result.title }}</h1>
         </div>
@@ -109,10 +108,11 @@
 import { marked } from 'marked'
 import { useImageUrl } from '@/composables/useImageUrl'
 import type { WorkshopResultBlock } from '~/types/Components'
+import type { UserStory } from '~/types/UserStory';
 const { getImageUrl } = useImageUrl()
 
 defineProps<{
-  result: WorkshopResultBlock[]
+  result: UserStory[]
 }>()
 
 function getColor(status: string) {
