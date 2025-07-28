@@ -25,10 +25,10 @@
       </div>
 
       <div v-else class="flex justify-end gap-2">
-        <UButton @click="() => (settingsOpen = true)" variant="ghost"
+        <UButton @click="() => (settingsOpen = true)" variant="soft" color="neutral"
           >Einstellungen anpassen</UButton
         >
-        <UButton @click="acceptClarity" color="primary"
+        <UButton @click="acceptClarity" variant="soft" color="neutral"
           >Alle akzeptieren</UButton
         >
       </div>

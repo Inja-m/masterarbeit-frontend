@@ -1,6 +1,5 @@
 <template>
  <Section>
-    <h1>Benachrichtigungen</h1>
     <div v-if="notifications.length === 0">
       Keine Benachrichtigungen
     </div>
@@ -19,6 +18,17 @@
 <script setup lang="ts">
 import type { UserNotification } from '~/types/UserNotification'
 import { useNotifications } from '~/composables/userNotification'
+
+useHead({
+  title: 'CoTrack'
+})
+definePageMeta({
+	header: {
+    title: 'Benachrichtigungen',
+    back: false,
+    showHeader: true
+  }
+})
 
 const { notifications, markAsRead } = useNotifications()
 

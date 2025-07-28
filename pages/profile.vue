@@ -5,7 +5,6 @@
       <h1 class="text-2xl font-semibold">{{ user?.username }}</h1>
       <UButton 
         trailing-icon="i-lucide-log-out" 
-        size="md" 
         color="neutral"
         class="mt-4" 
 				@click="handleLogout" 

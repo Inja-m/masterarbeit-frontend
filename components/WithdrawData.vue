@@ -11,9 +11,12 @@
       </h2>
 
       <p class="mb-6">
-        Gib bitte deinen persönlichen Code ein, damit wir deine Daten aus der Erhebung entfernen können.
+        Gib bitte deinen persönlichen Code ein, damit wir deine Daten aus der
+        Erhebung entfernen können.
       </p>
-			<PersonalCodeExample :personalCodeExample="resWorkshop.data.personalCodeExample" />
+      <PersonalCodeExample
+        :personalCodeExample="resWorkshop.data.personalCodeExample"
+      />
 
       <UForm
         :validate="validate"
@@ -41,24 +44,28 @@
         </div>
       </UForm>
 
-      <UAlert
-        v-if="verified"
-        color="warning"
-        variant="subtle"
-        icon="i-lucide-alert-circle"
-        class="mb-4"
-      >
-        <template #title>Hinweis zum Datenrückzug</template>
-        <template #description>
-          Durch das Zurückziehen werden deine Daten dauerhaft gelöscht und nicht in der Auswertung verwendet.
-          Bei Gruppenarbeiten wird die gesamte Gruppenarbeit entfernt.
-        </template>
-      </UAlert>
-
       <UModal v-model:open="showModal" title="Daten löschen?">
         <template #body>
+          <UAlert
+            v-if="verified"
+            color="error"
+            variant="subtle"
+            icon="i-lucide-alert-circle"
+            class="mb-8"
+          >
+            <template #title>Hinweis zum Datenrückzug</template>
+            <template #description>
+              Durch das Zurückziehen werden deine Daten dauerhaft gelöscht und
+              nicht in der Auswertung verwendet.
+              <span class="font-medium"
+                >Bei Gruppenarbeiten wird die gesamte Gruppenarbeit
+                entfernt.</span
+              >
+            </template>
+          </UAlert>
           <p>
-            Möchtest du wirklich deine Daten entfernen? Diese Aktion kann nicht rückgängig gemacht werden.
+            Möchtest du wirklich deine Daten entfernen? Diese Aktion kann nicht
+            rückgängig gemacht werden.
           </p>
         </template>
         <template #footer>
@@ -72,7 +79,7 @@
       </UModal>
     </template>
 
-    <template #footer>
+    <!--<template #footer>
       <UButton
         v-if="verified"
         label="Daten jetzt zurückziehen"
@@ -80,17 +87,18 @@
         class="w-full flex justify-center items-center"
         @click="confirmWithdraw"
       />
-    </template>
+    </template>-->
   </BaseModalAction>
 </template>
 
 <script setup lang="ts">
 import type { FormError, FormErrorEvent, FormSubmitEvent } from '@nuxt/ui'
 import type { Workshop } from '../types/Workshop'
+import type { PersonalCode } from '../types/PersonalCode'
 import BaseModalAction from './BaseModalAction.vue'
 
 const props = defineProps<{
-  open: boolean
+  open?: boolean
   workshopId: string
 }>()
 
@@ -117,12 +125,14 @@ const resWorkshop = await findOne<Workshop>('workshops', props.workshopId, {
   populate: { workshop_serie: { populate: '*' } }
 })
 
-watch(() => props.open, (val) => (modalOpen.value = val))
+watch(
+  () => props.open,
+  (val) => (modalOpen.value = val)
+)
 watch(modalOpen, (val) => emit('update:open', val))
 watch(showModal, (val) => (modalOpen.value = val))
 
-
-const validate = async (state: any): Promise<FormError[]> => {
+const validate = async (state: { code?: string }): Promise<FormError[]> => {
   const errorList = []
   if (!state.code) {
     errorList.push({ name: 'identifier', message: 'Erforderlich' })
@@ -135,6 +145,7 @@ async function onSubmit(_event: FormSubmitEvent<typeof state>) {
   if (isValid) {
     verified.value = true
     errors.code = undefined
+    showModal.value = true
   } else {
     verified.value = false
     errors.code = 'Code ungültig'
@@ -150,17 +161,13 @@ async function onError(event: FormErrorEvent) {
 }
 
 async function validateCode(code: string) {
-  const res = await find('personal-codes', {
+  const res = await find<PersonalCode>('personal-codes', {
     filters: {
       code: { $eq: code }
     }
   })
   codeId.value = res.data[0]?.documentId
   return res.data.length > 0
-}
-
-function confirmWithdraw() {
-  showModal.value = true
 }
 
 async function withdraw() {

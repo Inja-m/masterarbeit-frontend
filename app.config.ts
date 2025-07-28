@@ -1,5 +1,41 @@
 export default defineAppConfig({
-  ui: {
+  ui: {	
+		colors: {
+      done: 'done',
+      inprogress: 'inprogress',
+      todo: 'todo',
+    },
+		button:{
+			defaultVariants: {
+        size: 'lg'
+			}
+		},
+		switch:{
+			defaultVariants: {
+        size: 'lg'
+			}
+		},
+		checkbox:{
+			defaultVariants: {
+        size: 'lg'
+			}
+		},
+		textarea:{
+			defaultVariants: {
+        size: 'lg'
+			},
+		},
+		input:{
+			defaultVariants: {
+        size: 'lg'
+			}
+		},
+		select:{
+			defaultVariants: {
+        size: 'lg'
+			}
+		},
+	
 		alert: {
 			variants: {
 				orientation: {
@@ -12,6 +48,8 @@ export default defineAppConfig({
 		carousel: {
       slots: {
 				dots: '-bottom-6 gap-',
+				 prev: 'absolute rounded-full bg-accented',
+        next: 'absolute rounded-full bg-accented',
 				dot: 'size-2'
 			}
 		},

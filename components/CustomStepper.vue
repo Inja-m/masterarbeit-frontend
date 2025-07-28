@@ -1,12 +1,17 @@
 <template>
   <div class="w-full">
+		<div class="bg-accented rounded-lg p-4 mb-2">
+		 <h1>Status der Workshop-Auswertung</h1>
+  <p class="text-sm text-muted mb-6">
+    Verfolge hier den aktuellen Status der einzelnen Auswertungsschritte.
+  </p>
     <!-- Stepper Kopf mit Icons und Trennlinien -->
     <div
-      class="flex items-center justify-between bg-accented rounded-lg p-4 mb-2"
+      class="flex items-center justify-between"
     >
       <template v-for="(step, index) in steps" :key="index">
         <div
-          class="flex items-center"
+          class="flex items-baseline"
           :class="{ 'flex-1': index < steps.length - 1 }"
         >
           <!-- Step Icon -->
@@ -17,11 +22,9 @@
             <div
               class="flex items-center justify-center w-8 h-8 md:w-12 md:h-12 rounded-full transition-all"
               :class="[
-                index <= completedStep
-                  ? 'bg-inverted text-inverted'
-                  : 'border text-toned',
+                getStepColorClass(steps[index]?.evaluationStatus),
                 index === activeStep
-                  ? 'outline outline-2 outline-primary outline-offset-2'
+                  ? 'outline outline-2 outline-inverted outline-offset-2'
                   : ''
               ]"
             >
@@ -31,37 +34,26 @@
                 stroke-width="2"
               />
             </div>
+            <div class="text-xs mt-1 text-center text-muted">
+              {{ getStatusLabel(steps[index]?.evaluationStatus) }}
+            </div>
           </div>
 
           <!-- Trennlinie, außer beim letzten -->
           <div
             v-if="index < steps.length - 1"
-            class="flex-grow bg-inverted mx-1 md:mx-2"
-            :class="index < completedStep ? 'h-[1.5px]' : 'h-[0.5px]'"
+            class="flex-grow bg-inverted mx-1 md:mx-2 h-[1.0px]"
           />
         </div>
       </template>
     </div>
+	</div>
 
     <!-- Content -->
     <UCard variant="soft">
       <template #header>
         <div class="flex items-center justify-between">
           <h1>{{ activeStep + 1 }}. {{ steps[activeStep].name }}</h1>
-          <UBadge
-            :color="getStatusColor(steps[activeStep].evaluationStatus)"
-            variant="outline"
-            size="sm"
-            class="font-normal rounded-full whitespace-nowrap"
-          >
-            {{
-              steps[activeStep].evaluationStatus === 'done'
-                ? 'Abgeschlossen'
-                : steps[activeStep].evaluationStatus === 'inProgress'
-                ? 'In Bearbeitung'
-                : 'Ausstehend'
-            }}
-          </UBadge>
         </div>
       </template>
       <div
@@ -69,31 +61,34 @@
         class="prose max-w-none"
       />
 
-      <div v-if="steps[activeStep].evaluationStatus === 'done'" class="mt-4">
-        <div v-if="!isWorkshop">
-          <Digitisation
-            v-if="steps[activeStep].identifier === 'digitalisation'"
-            :result="steps[activeStep].result"
+      <div v-if="steps[activeStep]?.evaluationStatus !== 'todo'" class="mt-4">
+        <div v-if="!isWorkshop" class="space-y-4">
+          <Digitalisation
+            v-if="steps[activeStep]?.identifier === 'digitalisation'"
+            :result="steps[activeStep]?.result"
           />
           <Qualitative
             v-else-if="
-              steps[activeStep].identifier === 'qualitative' &&
+              steps[activeStep]?.identifier === 'qualitative' &&
               userStories.data &&
               userStories.data.length > 0
             "
             :result="userStories.data"
           />
 
-          <template v-else-if="steps[activeStep].identifier === 'publication'">
-            <h2>Veröffentlichte Materialien</h2>
-            <EvaluationStep :result="steps[activeStep].result" />
-          </template>
-
           <template v-else>
-            <TextBlock :result="steps[activeStep].result" />
-            <EvaluationStep :result="steps[activeStep].result" />
+            <TextBlock :result="steps[activeStep]?.result" />
+						<h2 v-if="steps[activeStep]?.identifier === 'publication'">Veröffentlichte Materialien</h2>
+            <EvaluationStep :result="steps[activeStep]?.result" />
           </template>
-					<TextBlock  v-if="['digitalisation', 'qualitative', 'publication'].includes(steps[activeStep].identifier) === true" :result="steps[activeStep].result" />
+          <TextBlock
+            v-if="
+              ['digitalisation', 'qualitative'].includes(
+                steps[activeStep]?.identifier
+              ) === true
+            "
+            :result="steps[activeStep]?.result"
+          />
         </div>
         <div v-if="isWorkshop">
           <UAlert color="neutral" variant="subtle">
@@ -116,14 +111,15 @@
       <template
         #footer
         v-if="
-          steps[activeStep].evaluationStatus !== 'done' &&
-          steps[activeStep].estimatedCompletion
+          steps[activeStep]?.evaluationStatus !== 'done' &&
+          steps[activeStep]?.estimatedCompletion
         "
       >
         <div class="text-xs">
           Voraussichtlicher Abschluss: KW
-          {{ getISOWeek(steps[activeStep].estimatedCompletion).week }}
-          {{ getISOWeek(steps[activeStep].estimatedCompletion).year }}
+          {{ getISOWeek(steps[activeStep]?.estimatedCompletion)?.week }} /
+					{{ getISOWeek(steps[activeStep]?.estimatedCompletion)?.month }}
+          {{ getISOWeek(steps[activeStep]?.estimatedCompletion)?.year }}
         </div>
       </template>
     </UCard>
@@ -132,12 +128,13 @@
 
 <script setup lang="ts">
 import * as LucideIcons from 'lucide-vue-next'
-import Digitisation from './evaluationStepResults/Digitisation.vue'
+import Digitalisation from './evaluationStepResults/Digitalisation.vue'
 import TextBlock from './evaluationStepResults/TextBlock.vue'
 import Qualitative from './evaluationStepResults/Qualitative.vue'
 import { marked } from 'marked'
 import { getISOWeek } from '@/utils/formatRelativeTime'
 import EvaluationStep from './evaluationStepResults/EvaluationStep.vue'
+import type { UserStory } from '../types/UserStory'
 
 const { find } = useStrapi()
 const route = useRoute()
@@ -145,13 +142,21 @@ const workshopID = route.params.id as string
 const user = await useUserWithRole()
 const isWorkshop = computed(() => user.value?.role?.name === 'Workshop')
 const userStories = ref(null)
-const activeStep = ref(0)
+const activeStep = ref<number>(0)
 
-defineProps<{
+const props = defineProps<{
   steps: { name: string; description: string; icon: string }[]
-  completedStep: number
 }>()
 
+function findActiveStep(steps) {
+  // 1. Schritt mit 'inProgress'
+  const inProgressIndex = steps.findIndex(s => s.evaluationStatus === 'todo')
+	console.log(inProgressIndex , steps.length)
+
+	if (inProgressIndex === 0) return inProgressIndex
+  if (inProgressIndex !== -1) return inProgressIndex - 1
+  return steps.length - 1
+}
 function getIconComponent(component: string) {
   return (
     LucideIcons[component as keyof typeof LucideIcons] || LucideIcons.HelpCircle
@@ -162,29 +167,51 @@ function setActive(index: number) {
   activeStep.value = index
 }
 
-function getStatusColor(status: string) {
+function getStepColorClass(status: string) {
   switch (status) {
     case 'done':
-      return 'success'
+      return 'border bg-done dark:text-inverted'
     case 'inProgress':
-      return 'info'
+      return 'border bg-inProgress dark:text-inverted'
     default:
-      return 'warning'
+      return 'border bg-todo dark:text-inverted'
   }
 }
-
-onMounted(async () => {
-  if (!isWorkshop.value) {
-    userStories.value = await find('user-stories', {
-      filters: {
-        workshop: {
-          documentId: {
-            $eq: workshopID
-          }
-        }
-      },
-      populate: '*'
-    })
+function getStatusLabel(status: string) {
+  switch (status) {
+    case 'done':
+      return 'Erledigt'
+    case 'inProgress':
+      return 'Laufend'
+    default:
+      return 'Offen'
   }
-})
+}
+watch(
+  () => user.value?.id,
+  async (newId, oldId) => {
+    if (newId && newId !== oldId) {
+			activeStep.value = findActiveStep(props.steps)
+      if (!isWorkshop.value) {
+        userStories.value = await find<UserStory>('user-stories', {
+          filters: {
+            workshop: {
+              documentId: {
+                $eq: workshopID
+              }
+            }
+          },
+          populate: {
+						workshop: true,
+						result: {
+    populate: '*'
+  }
+					}
+					 
+        })
+      }
+    }
+  },
+  { immediate: true }
+)
 </script>

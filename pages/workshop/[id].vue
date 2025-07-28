@@ -20,22 +20,41 @@
     <h1 class="py-2">
       {{ resWorkshop.data.workshop_serie.name }}
     </h1>
+
     <IconText :icon="Calendar" :text="formatDate(resWorkshop.data.date)" />
-    <IconText :icon="MapPin" :text="resWorkshop.data.location" />
+    <IconText :icon="MapPin" :text="resWorkshop.data.location.name" link  @click="open"/>
     <div v-if="resWorkshop.data.reward">
       <IconText :icon="HandCoins" :text="resWorkshop.data.reward" />
     </div>
-		<UAccordion :items="items">
-			<template #body>
-				 {{ resWorkshop.data.workshop_serie.description }} 
-				   <div v-for="image in resWorkshop.data.workshop_serie.material" :key="image.id">
-            <!-- Link anzeigen, wenn vorhanden -->
-            <!-- PDF -->
+    <UAccordion
+      type="multiple"
+      :items="items"
+      :ui="{
+        item: 'border-b-0',
+        label: 'text-base font-normal',
+        trigger: 'py-1 gap-3',
+        leadingIcon: 'shrink-0 size-6 text-lg'
+      }"
+    >
+      <template #body="{ item }">
+        <div v-if="item.label === 'Beschreibung'">
+          {{ resWorkshop.data.workshop_serie.description }}
+        </div>
+        <div v-else>
+          <p>
+            Hier findest du alle allgemeinen Workshop-Materialien und Vorlagen,
+            wie z. B. die Datenschutzerklärung oder Informationsblätter.
+            Persönliche Daten oder individuelle Ausfüllungen sind darin nicht
+            enthalten.
+          </p>
+          <div
+            v-for="image in resWorkshop.data.workshop_serie.material"
+            :key="image.id"
+          >
             <div v-if="image.mime === 'application/pdf'">
               <UButton
                 icon="i-lucide-download"
-								:label="image.name"
-                size="sm"
+                :label="image.name"
                 color="neutral"
                 variant="ghost"
                 :href="getImageUrl(image)"
@@ -43,24 +62,61 @@
                 download
               />
             </div>
-
-            <!-- Bild -->
             <div v-else>
               <img
                 :src="getImageUrl(image)"
                 :alt="image.name"
                 class="rounded"
-              >
+              />
             </div>
           </div>
-			</template>
-		</UAccordion>
-    <div class="my-4 mx-2">
-      <CustomStepper :steps="orderedSteps" :completed-step="completedStep" />
+        </div>
+      </template>
+    </UAccordion>
+  </Section>
+  <div v-if="orderedSteps?.length" class="mb-4 mx-2">
+    <CustomStepper :steps="orderedSteps" :completed-step="completedStep" />
+  </div>
+  <Section>
+    <h1 class="text-center">Team hinter dem Workshop</h1>
+
+    <UCarousel loop arrows auto-height :items="resTeamMembers.data" v-slot="{ item }">
+<UCard class="bg-primary-100 light text-default my-4">
+  <div class="flex flex-col items-center text-center">
+    <UAvatar
+      :src="getImageUrl(item?.team_member?.profilepicture?.url)"
+      :alt="item.team_member.username"
+      :ui="{ root: 'size-24 text-3xl' }"
+    />
+
+    <h2  class="mt-4">{{ item.team_member.username }}</h2>
+    <p class="text-sm text-gray-500">{{ item.workshopRole }}</p>
+    <div v-if="item.team_member.email" class="text-sm">
+			<div class="flex items-center space-x-1 py-1">
+		<AtSign :size="14" stroke-width="1.5" />
+      <a :href="`mailto:${item.team_member.email}`" class="underline">
+        {{ item.team_member.email }}
+      </a>
+		</div>
     </div>
+    <div v-if="item.team_member.phone" class="text-sm">
+			<div class="flex items-center space-x-1 py-1">
+		<Phone :size="14" stroke-width="1.5" />
+      <a :href="`tel:${item.team_member.phone}`" class="underline">
+        {{ item.team_member.phone }}
+      </a>
+		</div>
+    </div>
+  </div>
+
+  <p class="py-4 px-2 text-center">„{{ item.description }}“</p>
+</UCard>
+    </UCarousel>
   </Section>
   <Section bg-color="bg-primary-100" class="light text-default">
-    <h1 class="pb-4">Wir freuen uns über einen weiteren Austausch</h1>
+    <h1 class="text-center pb-4">
+      Wir freuen uns über einen weiteren Austausch
+    </h1>
     <UForm :state="state" class="pb-4" @submit="onSubmit">
       <UFormField name="anonym">
         <template v-if="isWorkshop">
@@ -106,12 +162,32 @@
 </template>
 
 <script setup lang="ts">
-import { Calendar, MapPin, HandCoins } from 'lucide-vue-next'
+import { Calendar, MapPin, HandCoins, Phone, AtSign } from 'lucide-vue-next'
 import type { Workshop } from '../../types/Workshop'
-import type { WorkshopResult } from '~/types/WorkshopResult'
+import type { User } from '../../types/User'
+import type { Team } from '../../types/Team'
 import type { Message } from '~/types/Message'
 import { useImageUrl } from '@/composables/useImageUrl'
+import { LocationModal } from '#components'
+import type { FormSubmitEvent } from '@nuxt/ui'
+import type { Participation } from '~/types/Participation'
+import type { WorkshopResult, StepResult} from '~/types/WorkshopResult'
+import type { EvaluationStep } from '~/types/EvaluationStep'
+export type EvaluationStepWithStatus = EvaluationStep & StepResult
+
 const { getImageUrl } = useImageUrl()
+
+const overlay = useOverlay()
+const modal = overlay.create(LocationModal)
+
+async function open() {
+  const instance = modal.open({location: resWorkshop.data.location})
+  const everythingRight = await instance.result
+
+  if (everythingRight) {
+    return
+  }
+}
 
 definePageMeta({
   name: 'workshop-details',
@@ -126,7 +202,7 @@ const { findOne, find, create } = useStrapi()
 const route = useRoute()
 const workshopID = route.params.id as string
 const messages = ref<Message[]>([])
-const user = await useUserWithRole()
+const user = await useUserWithRole() as Ref<User | null>
 const isWorkshop = computed(() => user.value?.role?.name === 'Workshop')
 
 const state = reactive({
@@ -136,6 +212,7 @@ const state = reactive({
 
 onMounted(async () => {
   loadMessages()
+  loadEvaluationSteps()
   if (!isWorkshop.value) {
     route.meta.header = {
       title: 'Co-Design Workshop',
@@ -143,15 +220,27 @@ onMounted(async () => {
       showHeader: true
     }
   }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', async () => {
+      loadEvaluationSteps()
+    })
+  }
+})
+const resWorkshop = await findOne<Workshop>('workshops', workshopID, {
+  populate: { 
+		workshop_serie: { populate: '*' },
+		location: { populate: '*' },
+ }
 })
 
-const resWorkshop = await findOne<Workshop>('workshops', workshopID, {
-  populate: { workshop_serie: { populate: '*' } }
-})
-const items = ref<AccordionItem[]>([
+const items = ref([
   {
-    label: 'Weitere Informationen',
+    label: 'Beschreibung',
     icon: 'i-lucide-scroll-text'
+  },
+  {
+    label: 'Materialien',
+    icon: 'i-lucide-folder-open'
   }
 ])
 const resWorkshopResults = await find<WorkshopResult>('workshop-results', {
@@ -174,67 +263,50 @@ const resWorkshopResults = await find<WorkshopResult>('workshop-results', {
             workshop_group: true,
             Text: true
           }
+        },
+        'media.research': {
+          populate: {
+            researchQuestion: {
+              populate: '*'
+            },
+            researchDesign: {
+              populate: '*'
+            },
+						context: {
+              populate: '*'
+            },
+          }
         }
       }
     }
   }
 })
 
-useHead({
-  title: resWorkshop.data.workshop_serie.name
-})
-
-const userParticipationRes = await find('participations', {
+const resTeamMembers = await find<Team>('teams', {
   filters: {
-    user: {
-      id: { $eq: user.value.id }
+    workshop_serie: {
+      id: {
+        $eq: resWorkshop.data.workshop_serie.id
+      }
     }
   },
   populate: {
-    workshop_group: {
-      populate: ['workshop']
+    team_member: {
+      populate: { 
+				profilepicture: {
+					populate :'*'
+				}
+			}
     }
-  }
+  },
+	sort: ['workshopRole:desc']
 })
 
-const userParticipation = userParticipationRes.data.find(
-  (p) => p.workshop_group?.workshop?.documentId === workshopID
-)
 
-const userGroupId = userParticipation.workshop_group.documentId
+const userGroupId = ref<string>()
+const filteredResults = ref<WorkshopResult[]>([])
+const stepsWithStatus = ref<( EvaluationStepWithStatus )[]>([])
 
-const filteredResults = resWorkshopResults.data
-  .map((result) => {
-    const filteredComponents = result.Result.filter((component) => {
-      return (
-        component.__component === 'media.totality' &&
-        (!component.workshop_group || // keine Workshop-Gruppe zugewiesen
-          component.workshop_group.documentId === userGroupId)
-      )
-    })
-
-    return {
-      ...result,
-      Result: filteredComponents
-    }
-  })
-  .filter(
-    (result) => result.Result.length > 0 || result.evaluationStatus !== 'to do'
-  )
-
-const stepsWithStatus = computed(() => {
-  return resWorkshop.data.workshop_serie.evaluation_steps.map((step: any) => {
-    const result = filteredResults.find(
-      (r: any) => r.evaluation_step.id === step.id
-    )
-    return {
-      ...step,
-      evaluationStatus: result?.evaluationStatus,
-			estimatedCompletion: result?.estimatedCompletion,
-      result: result?.Result
-    }
-  })
-})
 
 const orderedSteps = computed(() => {
   const order = { done: 0, inProgress: 1, todo: 2 }
@@ -247,9 +319,74 @@ const orderedSteps = computed(() => {
 
 const completedStep = computed(() =>
   orderedSteps.value.findLastIndex(
-    (step: any) => step.evaluationStatus === 'done'
+    (step: EvaluationStepWithStatus) => step.evaluationStatus === 'done'
   )
 )
+
+async function loadEvaluationSteps() {
+  if (!resWorkshop.data.workshop_serie?.evaluation_steps) {
+    console.warn(
+      'Keine evaluation_steps im Workshop vorhanden:',
+      resWorkshop.data
+    )
+  }
+  console.log('hier')
+  const userParticipationRes = await find<Participation>('participations', {
+    filters: {
+      user: { id: { $eq: user.value.id } }
+    },
+    populate: {
+      workshop_group: {
+        populate: ['workshop']
+      }
+    }
+  })
+
+  const userParticipation = userParticipationRes.data.find(
+    (p) => p.workshop_group?.workshop?.documentId === workshopID
+  )
+
+  if (!userParticipation) return
+
+  userGroupId.value = userParticipation.workshop_group.documentId
+
+  const filtered = resWorkshopResults.data
+    .map((result) => {
+      const filteredComponents = result.Result.filter((component) => {
+  const isTotality =
+    component.__component === 'media.totality' &&
+    (!component.workshop_group ||
+      component.workshop_group.documentId === userGroupId.value)
+
+  const isResearch = component.__component === 'media.research' 
+  return isTotality || isResearch
+})
+
+      return {
+        ...result,
+        Result: filteredComponents
+      }
+    })
+    .filter(
+      (result) =>
+        result.Result.length > 0 || result.evaluationStatus !== 'todo'
+    )
+
+  filteredResults.value = filtered
+		console.log(filteredResults)
+  stepsWithStatus.value = resWorkshop.data.workshop_serie.evaluation_steps.map(
+    (step: EvaluationStepWithStatus) => {
+      const result = filtered.find((r: aEvaluationStepWithStatus) => r.evaluation_step.id === step.id)
+      return {
+        ...step,
+        evaluationStatus: result?.evaluationStatus ?? 'todo',
+        estimatedCompletion: result?.estimatedCompletion,
+        result: result?.Result
+      }
+    }
+  )
+	console.log(stepsWithStatus)
+}
 
 async function loadMessages() {
   try {
@@ -273,19 +410,18 @@ async function loadMessages() {
 
 async function onSubmit(event: FormSubmitEvent<typeof state>) {
   try {
-    
-		if (!state.message || state.message.trim() === '') {
-			return 
-		}
-    const message: any = {
+    if (!state.message || state.message.trim() === '') {
+      return
+    }
+    const message: Message = {
       message: state.message,
       workshop: resWorkshop.data.documentId
     }
     if (!isWorkshop.value && !state.anonym) {
-			//console.log(user.value)
-      message.author =user.value.id
+      //console.log(user.value)
+      message.author = user.value.id
     }
-    await create('messages', message)
+    await create<Message>('messages', message)
     state.anonym = false
     state.message = undefined
     await loadMessages()

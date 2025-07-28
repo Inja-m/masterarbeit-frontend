@@ -15,7 +15,7 @@
           workshop.workshop_serie.project.name
         }}</UBadge>
         <IconText :icon="Calendar" :text="formatDate(workshop.date)" />
-        <IconText :icon="MapPin" :text="workshop.location" />
+        <IconText :icon="MapPin" :text="workshop.location.name" />
         <div v-if="workshop.reward">
           <IconText :icon="HandCoins" :text="workshop.reward" />
         </div>
@@ -31,6 +31,7 @@
 import { Calendar, MapPin, HandCoins } from 'lucide-vue-next'
 import type { Participation } from '~/types/Participation'
 import type { Workshop } from '~/types/Workshop'
+import type { User } from '../types/User'
 import { JoinGroupModal } from '#components'
 
 useHead({
@@ -38,6 +39,11 @@ useHead({
 })
 definePageMeta({
   name: 'home',
+	header: {
+    title: 'Teilgenommene Workshops',
+    back: false,
+    showHeader: true
+  }
 })
 
 const overlay = useOverlay()
@@ -60,7 +66,7 @@ const userWorkshops = ref<Workshop[]>([])
 
 const fetchUserWorkshops = async () => {
   try {
-    const user = await fetchUser()
+    const user = await fetchUser() as Ref<User | null>
 		
     const response = await find<Participation>('participations', {
       filters: {
@@ -77,7 +83,8 @@ const fetchUserWorkshops = async () => {
               populate: {
                 workshop_serie: {
                   populate: ['project'] 
-                }
+                },
+								location: { populate: '*' },
               }
             }
           }

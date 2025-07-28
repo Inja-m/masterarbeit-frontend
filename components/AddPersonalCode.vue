@@ -8,8 +8,8 @@
     <template #title>Infos zum Codewort</template>
     <template #description>
       Mithilfe deines persönlichen Codewortes kannst du später die Löschung
-      deiner Daten veranlassen. Der Code wird so gespeichert, dass kein Rückschluss auf ein Profil möglich ist.
-			Hast du bereit eins für diesen Workshop hinterlegt einfach ignorieren.
+      deiner Daten veranlassen. Der Code wird so gespeichert, dass kein Rückschluss auf ein Profil möglich ist. <br />
+			<strong>Bitte notiere dir das Codewort oder mache einen Screenshot davon, es kann nicht erneut angezeigt werden.</strong>
     </template>
   </UAlert>
 	<PersonalCodeExample :personalCodeExample="workshop?.personalCodeExample" />
@@ -32,11 +32,11 @@
     <UFormField label="Codewort" name="personalCode">
       <UInput v-model="state.personalCode" placeholder="Personal Code" class="w-full" />
     </UFormField>
-<div class="flex items-center justify-end h-full">
+		  </UForm>
+<div class="flex items-center justify-end pt-4">
 	<UButton :disabled="!isFormValid" type="submit"> Hinzufügen </UButton>
 </div>
-			
-  </UForm>
+		
 </template>
 
 <script setup lang="ts">
@@ -63,7 +63,7 @@ const isFormValid = computed(() => {
   return !!state.personalCode && !!state.groupId
 })
 
-const validate = async (state: any): Promise<FormError[]> => {
+const validate = async (state:{groupId: string, personalCode: string}): Promise<FormError[]> => {
   const errors = []
   if (!state.groupId) errors.push({ name: 'groupId', message: 'Erforderlich' })
 	if (props.required && !state.personalCode) errors.push({ name: 'personalCode', message: 'Erforderlich' })

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-screen">
+  <div class="flex flex-col h-svh">
     <HeaderTitle
       v-if="metaHeader.showHeader"
       :title="metaHeader.title"
@@ -7,11 +7,11 @@
       :show-x="metaHeader.showX"
       @back="handleBack"
     />
-    <div class="grow overflow-y-auto flex flex-col justify-between">
-      <main>
+    <div class="grow flex flex-col justify-between overflow-y-hidden  w-full">
+      <main class="overflow-y-auto">
         <slot />
       </main>
-      <footer class="flex items-end text-center text-xs text-gray-500 py-3">
+      <footer v-if="!isPathNavigation() || isWorkshopRole || isPathProfile()" class="flex items-end text-center text-xs text-gray-500 py-3">
         <UContainer class="flex flex-wrap items-end justify-center gap-4">
           <NuxtLink to="/datenschutz" class="hover:underline"
             >Datenschutz</NuxtLink
@@ -20,24 +20,29 @@
         </UContainer>
       </footer>
     </div>
-
     <BottomNavigation v-if="isPathNavigation() && !isWorkshopRole" />
   </div>
 </template>
 
 <script setup lang="ts">
+import type { User } from '../types/User'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
 
 function isPathNavigation () {
-if(route.path === '/login'||route.path === '/impressum' ||route.path === '/datenschutz') return false
+if(route.path === '/login'||route.path === '/passwordreset'|| route.path === '/impressum' ||route.path === '/datenschutz') return false
 return true
 }
 
+function isPathProfile () {
+if(route.path === '/profile') return true
+return false
+}
 
-const user = await useUserWithRole()
+
+const user = await useUserWithRole() as Ref<User | null>
 const { find } = useStrapi()
 
 const isWorkshopRole = computed(() => {

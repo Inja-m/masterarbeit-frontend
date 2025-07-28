@@ -2,17 +2,17 @@
 export default defineNuxtConfig({
     runtimeConfig: {
     public: {
-			scripts: {
+            scripts: {
         clarity: {
           id: process.env.NUXT_PUBLIC_SCRIPTS_CLARITY_ID,
         },
-			},
+            },
       strapiBaseUrl: process.env.STRAPI_URL,
       vapidPublicKey: process.env.VAPID_PUBLIC_KEY
     }
   },
   compatibilityDate: '2024-11-01',
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   modules: [
    '@nuxt/content',
    '@nuxt/eslint',
@@ -24,16 +24,16 @@ export default defineNuxtConfig({
    '@nuxt/ui',
    '@vite-pwa/nuxt',
    '@nuxtjs/strapi',
-	 '@nuxt/scripts'
+    '@nuxt/scripts'
   ],
   css: ['~/assets/css/main.css'],
-	pwa: {
-		manifest:{
-			name:"CoTrack",
-			short_name: "CoTrack",
-			description: "Tracking your Co-Design impact",
-			start_url: '/',
-			icons: [
+    pwa: {
+        manifest:{
+            name:"CoTrack",
+            short_name: "CoTrack",
+            description: "Tracking your Co-Design impact",
+            start_url: '/',
+            icons: [
         {
           src: 'public/icons/icon_512x512.png',
           sizes: '512x512',
@@ -44,13 +44,13 @@ export default defineNuxtConfig({
           type: 'image/png',
         },
       ],
-		},
-		 workbox: {
-			 importScripts: ['/service-worker/push.js'],
+        },
+         workbox: {
+             importScripts: ['/service-worker/push.js'],
       navigateFallback: '/'
     }
-	},
-	imports: {
+    },
+    imports: {
     dirs: ['utils']
   },
 	 ui: {
