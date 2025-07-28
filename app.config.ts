@@ -1,6 +1,11 @@
 export default defineAppConfig({
   ui: {	
 		colors: {
+			secondary: 'sky',
+			success: 'emerald',
+			warning: 'amber',
+			error: 'red',
+			info: 'blue',
       done: 'done',
       inProgress: 'inProgress',
       todo: 'todo',

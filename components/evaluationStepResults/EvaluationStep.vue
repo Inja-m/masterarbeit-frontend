@@ -32,7 +32,7 @@
             v-for="linkItem in item.links"
             :key="linkItem.id"
             icon="i-lucide-external-link"
-            :label="linkItem.link"
+            :label="linkItem.label || linkItem.link"
             color="neutral"
             variant="ghost"
             :href="linkItem.link"

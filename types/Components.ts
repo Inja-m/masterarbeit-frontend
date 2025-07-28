@@ -9,6 +9,7 @@ export interface MediaResearchQuestion {
 }
 export interface MediaLink {
   link: string
+	label: string
 }
 export interface MediaText {
   text: string

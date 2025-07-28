@@ -56,6 +56,11 @@ export default defineNuxtConfig({
 	ui: {
     theme: {
       colors: [
+				'info',
+				'secondary',
+				'success',
+				'warning',
+				'error',
 				'done',
 				'inProgress',
 				'todo'
