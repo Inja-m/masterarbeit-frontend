@@ -18,6 +18,7 @@
     loop
     :ui="{
       dot: 'bg-default w-2 h-1',
+			dots: 'gap-2',
       container: 'transition-[height]',
       controls: 'absolute -top-8 inset-x-2'
     }"
@@ -28,9 +29,12 @@
         >, damit {{ item.benefit }}.
       </template>
       <template
-        v-if="item.developmentStatus !== 'todo' && item.result"
+        v-if="item.developmentStatus !== 'todo' && item.developmentStatus !== null "
         #default
       >
+			<h1  v-if="item.developmentStatus === 'inProgress'">Aktuell in Beabeitung</h1>
+			<h1  v-if="item.developmentStatus === 'done'">Umgesetzt</h1>
+			<div v-if="item.result">
         <div v-if="item.result.title">
           <h1>{{ item.result.title }}</h1>
         </div>
@@ -96,6 +100,7 @@
             class="light"
           />
         </div>
+				</div>
       </template>
     </UCard>
   </UCarousel>
