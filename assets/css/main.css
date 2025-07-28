@@ -2,9 +2,9 @@
 @import "@nuxt/ui";
 
 @theme default {
-  --color-done: var(--color-success-300);
-	--color-inProgress: var(--color-info-300) ;
-	--color-todo: var(--color-warning-100);
+  --color-done:  oklch(0.871 0.15 154.449);
+	--color-inProgress: oklch(0.809 0.105 251.813) ;
+	--color-todo: oklch(0.973 0.071 103.193);
 }
 
 h1 {

@@ -2,7 +2,7 @@ export default defineAppConfig({
   ui: {	
 		colors: {
       done: 'done',
-      inprogress: 'inprogress',
+      inProgress: 'inProgress',
       todo: 'todo',
     },
 		button:{

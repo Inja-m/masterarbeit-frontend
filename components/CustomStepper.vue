@@ -24,7 +24,7 @@
               :class="[
                 getStepColorClass(steps[index]?.evaluationStatus),
                 index === activeStep
-                  ? 'outline outline-2 outline-inverted outline-offset-2'
+                  ? 'outline outline-2 dark:outline-inverted outline-offset-2'
                   : ''
               ]"
             >
@@ -135,6 +135,10 @@ import { marked } from 'marked'
 import { getISOWeek } from '@/utils/formatRelativeTime'
 import EvaluationStep from './evaluationStepResults/EvaluationStep.vue'
 import type { UserStory } from '../types/UserStory'
+import type { StepResult} from '~/types/WorkshopResult'
+import type { EvaluationStep as EvaluationStepType } from '~/types/EvaluationStep'
+export type EvaluationStepWithStatus = EvaluationStepType & StepResult
+
 
 const { find } = useStrapi()
 const route = useRoute()
@@ -145,9 +149,10 @@ const userStories = ref(null)
 const activeStep = ref<number>(0)
 
 const props = defineProps<{
-  steps: { name: string; description: string; icon: string }[]
+  steps: EvaluationStepWithStatus[]
 }>()
 
+console.log(props.steps)
 function findActiveStep(steps) {
   // 1. Schritt mit 'inProgress'
   const inProgressIndex = steps.findIndex(s => s.evaluationStatus === 'todo')
@@ -168,6 +173,7 @@ function setActive(index: number) {
 }
 
 function getStepColorClass(status: string) {
+	console.log(status)
   switch (status) {
     case 'done':
       return 'border bg-done dark:text-inverted'

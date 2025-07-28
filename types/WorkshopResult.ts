@@ -13,12 +13,13 @@ export interface WorkshopResult {
   Result: WorkshopResultBlock[]
   workshop: Workshop
 	estimatedCompletion: string
-	  createdAt: string
+	createdAt: string
   updatedAt: string
   publishedAt: string
 }
 
 export interface StepResult {
-  evaluationStatus: EvaluationStatus
+  evaluationStatus: string
+  estimatedCompletion: string
   result: WorkshopResultBlock[]
 }

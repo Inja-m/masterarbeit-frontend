@@ -376,7 +376,7 @@ async function loadEvaluationSteps() {
 		console.log(filteredResults)
   stepsWithStatus.value = resWorkshop.data.workshop_serie.evaluation_steps.map(
     (step: EvaluationStepWithStatus) => {
-      const result = filtered.find((r: aEvaluationStepWithStatus) => r.evaluation_step.id === step.id)
+      const result = filtered.find((r: EvaluationStepWithStatus) => r.evaluation_step.id === step.id)
       return {
         ...step,
         evaluationStatus: result?.evaluationStatus ?? 'todo',

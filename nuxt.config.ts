@@ -53,7 +53,7 @@ export default defineNuxtConfig({
 	imports: {
     dirs: ['utils']
   },
-	 ui: {
+	ui: {
     theme: {
       colors: [
 				'done',
