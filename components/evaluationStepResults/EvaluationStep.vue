@@ -22,7 +22,7 @@
               <img
                 :src="getImageUrl(image)"
                 :alt="image.name"
-                class="rounded"
+                class="rounded mb-2"
               />
             </div>
           </div>

@@ -109,7 +109,7 @@
     </div>
   </div>
 
-  <p class="py-4 px-2 text-center">„{{ item.description }}“</p>
+  <p v-if="item.description" class="py-4 px-2 text-center">„{{ item.description }}“</p>
 </UCard>
     </UCarousel>
   </Section>

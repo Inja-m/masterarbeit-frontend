@@ -32,8 +32,8 @@
         v-if="item.developmentStatus !== 'todo' && item.developmentStatus !== null "
         #default
       >
-			<h1  v-if="item.developmentStatus === 'inProgress'">Aktuell in Beabeitung</h1>
-			<h1  v-if="item.developmentStatus === 'done'">Umgesetzt</h1>
+			<h2  v-if="item.developmentStatus === 'inProgress'">Aktuell in Beabeitung</h2>
+			<h2  v-if="item.developmentStatus === 'done'">Umgesetzt</h2>
 			<div v-if="item.result">
         <div v-if="item.result.title">
           <h1>{{ item.result.title }}</h1>
