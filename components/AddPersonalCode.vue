@@ -8,11 +8,15 @@
     <template #title>Infos zum Codewort</template>
     <template #description>
       Mithilfe deines persönlichen Codewortes kannst du später die Löschung
-      deiner Daten veranlassen. Der Code wird so gespeichert, dass kein Rückschluss auf ein Profil möglich ist. <br />
-			<strong>Bitte notiere dir das Codewort oder mache einen Screenshot davon, es kann nicht erneut angezeigt werden.</strong>
+      deiner Daten veranlassen. Der Code wird so gespeichert, dass kein
+      Rückschluss auf ein Profil möglich ist. <br />
+      <strong
+        >Bitte notiere dir das Codewort oder mache einen Screenshot davon, es
+        kann nicht erneut angezeigt werden.</strong
+      >
     </template>
   </UAlert>
-	<PersonalCodeExample :personalCodeExample="workshop?.personalCodeExample" />
+  <PersonalCodeExample :personalCodeExample="workshop?.personalCodeExample" />
   <UForm
     :validate="validate"
     :state="state"
@@ -20,23 +24,35 @@
     @submit="onSubmit"
     @error="onError"
   >
-	
-    <UFormField v-if="workshop?.workshop_groups?.length > 1" label="Gruppen Auswahl" name="groupID" :required="required === false">
+    <UFormField
+      v-if="workshop?.workshop_groups?.length > 1"
+      label="Gruppen Auswahl"
+      name="groupID"
+      :required="required === false"
+    >
       <USelect
         v-model="state.groupId"
-        :items="workshop?.workshop_groups.map((g) => ({ label: g.name, value: g.documentId }))"
+        :items="
+          workshop?.workshop_groups.map((g) => ({
+            label: g.name,
+            value: g.documentId
+          }))
+        "
         placeholder="auswählen..."
         class="w-full"
       />
     </UFormField>
     <UFormField label="Codewort" name="personalCode">
-      <UInput v-model="state.personalCode" placeholder="Personal Code" class="w-full" />
+      <UInput
+        v-model="state.personalCode"
+        placeholder="Personal Code"
+        class="w-full"
+      />
     </UFormField>
-		  </UForm>
-<div class="flex items-center justify-end pt-4">
-	<UButton :disabled="!isFormValid" type="submit"> Hinzufügen </UButton>
-</div>
-		
+    <div class="flex items-center justify-end pt-4">
+      <UButton :disabled="!isFormValid" type="submit"> Hinzufügen </UButton>
+    </div>
+  </UForm>
 </template>
 
 <script setup lang="ts">
@@ -59,16 +75,20 @@ const state = reactive({
 })
 
 const isFormValid = computed(() => {
-	if(!props.required && !!state.groupId ) return true
+  if (!props.required && !!state.groupId) return true
   return !!state.personalCode && !!state.groupId
 })
 
-const validate = async (state:{groupId: string, personalCode: string}): Promise<FormError[]> => {
+const validate = async (state: {
+  groupId: string
+  personalCode: string
+}): Promise<FormError[]> => {
   const errors = []
   if (!state.groupId) errors.push({ name: 'groupId', message: 'Erforderlich' })
-	if (props.required && !state.personalCode) errors.push({ name: 'personalCode', message: 'Erforderlich' })
-		return errors
-	}
+  if (props.required && !state.personalCode)
+    errors.push({ name: 'personalCode', message: 'Erforderlich' })
+  return errors
+}
 
 async function onError(event: FormErrorEvent) {
   if (event?.errors?.[0]?.id) {
@@ -80,12 +100,12 @@ async function onError(event: FormErrorEvent) {
 
 async function onSubmit(_event: FormSubmitEvent<typeof state>) {
   try {
-		if(state.personalCode && state.groupId) {
-			await create('personal-codes', {
-				code: state.personalCode,
-				workshop_group: state.groupId
-			})
-		}
+    if (state.personalCode && state.groupId) {
+      await create('personal-codes', {
+        code: state.personalCode,
+        workshop_group: state.groupId
+      })
+    }
     emit('close', state.groupId)
   } catch (error: any) {
     console.error(
@@ -97,10 +117,10 @@ async function onSubmit(_event: FormSubmitEvent<typeof state>) {
 
 const loadWorkshopGroups = async () => {
   const res = await findOne<Workshop>('workshops', props.workshopId, {
-    populate: { workshop_groups: { populate: '*' }}
+    populate: { workshop_groups: { populate: '*' } }
   })
   workshop.value = res.data
-  if ( workshop.value.workshop_groups.length === 1) {
+  if (workshop.value.workshop_groups.length === 1) {
     state.groupId = workshop.value.workshop_groups[0].documentId
   }
 }
