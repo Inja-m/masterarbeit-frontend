@@ -204,6 +204,7 @@ const workshopID = route.params.id as string
 const messages = ref<Message[]>([])
 const user = await useUserWithRole() as Ref<User | null>
 const isWorkshop = computed(() => user.value?.role?.name === 'Workshop')
+const resWorkshopResults = ref<WorkshopResult[]>([])
 
 const state = reactive({
   anonym: false,
@@ -221,11 +222,44 @@ onMounted(async () => {
     }
   }
   if ('serviceWorker' in navigator) {
+		console.log('serviceWorker')
     navigator.serviceWorker.addEventListener('message', async () => {
       loadEvaluationSteps()
     })
   }
 })
+
+
+async function loadWorkshopResults() {
+  const result = await find<WorkshopResult>('workshop-results', {
+    filters: {
+      workshop: { id: { $eq: resWorkshop.data.id } }
+    },
+    populate: {
+      evaluation_step: true,
+      Result: {
+        on: {
+          'media.totality': {
+            populate: {
+              Pictures: { populate: '*' },
+              workshop_group: true,
+              Text: true
+            }
+          },
+          'media.research': {
+            populate: {
+              researchQuestion: { populate: '*' },
+              researchDesign: { populate: '*' },
+              context: { populate: '*' }
+            }
+          }
+        }
+      }
+    }
+  })
+  resWorkshopResults.value = result.data
+}
+
 const resWorkshop = await findOne<Workshop>('workshops', workshopID, {
   populate: { 
 		workshop_serie: { populate: '*' },
@@ -243,44 +277,7 @@ const items = ref([
     icon: 'i-lucide-folder-open'
   }
 ])
-const resWorkshopResults = await find<WorkshopResult>('workshop-results', {
-  filters: {
-    workshop: {
-      id: {
-        $eq: resWorkshop.data.id
-      }
-    }
-  },
-  populate: {
-    evaluation_step: true,
-    Result: {
-      on: {
-        'media.totality': {
-          populate: {
-            Pictures: {
-              populate: '*'
-            },
-            workshop_group: true,
-            Text: true
-          }
-        },
-        'media.research': {
-          populate: {
-            researchQuestion: {
-              populate: '*'
-            },
-            researchDesign: {
-              populate: '*'
-            },
-						context: {
-              populate: '*'
-            },
-          }
-        }
-      }
-    }
-  }
-})
+
 
 const resTeamMembers = await find<Team>('teams', {
   filters: {
@@ -324,6 +321,9 @@ const completedStep = computed(() =>
 )
 
 async function loadEvaluationSteps() {
+	await loadWorkshopResults()
+console.log("NEr")
+console.log(resWorkshopResults)
   if (!resWorkshop.data.workshop_serie?.evaluation_steps) {
     console.warn(
       'Keine evaluation_steps im Workshop vorhanden:',
@@ -350,7 +350,7 @@ async function loadEvaluationSteps() {
 
   userGroupId.value = userParticipation.workshop_group.documentId
 
-  const filtered = resWorkshopResults.data
+  const filtered = resWorkshopResults.value
     .map((result) => {
       const filteredComponents = result.Result.filter((component) => {
   const isTotality =
@@ -373,7 +373,7 @@ async function loadEvaluationSteps() {
     )
 
   filteredResults.value = filtered
-		console.log(filteredResults)
+	console.log(filteredResults)
   stepsWithStatus.value = resWorkshop.data.workshop_serie.evaluation_steps.map(
     (step: EvaluationStepWithStatus) => {
       const result = filtered.find((r: EvaluationStepWithStatus) => r.evaluation_step.id === step.id)
