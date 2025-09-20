@@ -15,7 +15,9 @@
           workshop.workshop_serie.project.name
         }}</UBadge>
         <IconText :icon="Calendar" :text="formatDate(workshop.date)" />
-        <IconText :icon="MapPin" :text="workshop.location.name" />
+				<div v-if="workshop.location">
+					<IconText :icon="MapPin" :text="workshop.location.name" />
+				</div>
         <div v-if="workshop.reward">
           <IconText :icon="HandCoins" :text="workshop.reward" />
         </div>
@@ -91,6 +93,7 @@ const fetchUserWorkshops = async () => {
         }
       }
     })
+		console.log(response)
     const allWorkshops = response.data
       .map((participation) => participation.workshop_group?.workshop)
       .filter(Boolean) 

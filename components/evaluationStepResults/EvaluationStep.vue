@@ -91,14 +91,14 @@
   </template>
 
   <template v-else-if="item.type === 'bibliography'">
-    <ol>
+    <ul class="!list-none">
       <li
         v-for="(entry, index) in item.data"
         :key="index"
       >
         [{{ index + 1 }}] {{ entry.author }}, <i>{{ entry.title }}</i>, {{ entry.year }}.
       </li>
-    </ol>
+    </ul>
   </template>
 
   <template v-else-if="item.type === 'context'">
